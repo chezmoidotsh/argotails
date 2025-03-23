@@ -1,0 +1,103 @@
+# trunk-ignore-all(checkov/CKV_K8S_21): The namespace is managed by Kustomize and the kustomization.yaml
+# trunk-ignore-all(checkov/CKV_K8S_38): This is required for Argotails as it is a Kubernetes controller
+# trunk-ignore-all(checkov/CKV_K8S_43,checkov/CKV_K8S_14): The image is managed by Kustomize and the kustomization.yaml
+# trunk-ignore-all(checkov/CKV2_K8S_6): Network policies must be defined by the end-user as they are specific to the environment
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/instance: argotails-controller
+  name: argotails
+spec:
+  replicas: 1 # WARNING: only 1 replica must be used, as Argotails running in HA mode may result in conflicts
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: argotails-controller
+  strategy:
+    type: Recreate # NOTE: Recreate strategy is used to ensure that only one replica is running at a time
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: argotails-controller
+    spec:
+      automountServiceAccountToken: true
+      containers:
+        - args:
+            - --ts.auth-key-file=/run/secrets/argotails/authkey
+            - --ts.device-filter=k8s-operator # NOTE: this tag is the default one defined in Tailscale documentation
+          env:
+            - name: TAILSCALE_TAILNET
+              value: example.ts.net # NOTE: this is a placeholder, replace with your Tailscale tailnet
+          image: ghcr.io/chezmoi-sh/argotails:latest
+          imagePullPolicy: Always
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /livez
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 1
+          name: argotails
+          ports:
+            - containerPort: 8080
+              name: metrics
+              protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /readyz
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 500m
+              memory: 100Mi
+            requests:
+              cpu: 50m
+              memory: 100Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            privileged: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+          volumeMounts:
+            - mountPath: /run/secrets/argotails
+              name: credentials
+      serviceAccountName: argotails
+      securityContext:
+        fsGroup: 54684
+        runAsGroup: 45563
+        runAsNonRoot: true
+        runAsUser: 30584
+        seccompProfile:
+          type: RuntimeDefault
+      volumes:
+        - name: credentials
+          secret:
+            secretName: argotails-secrets
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: argotails
+  labels:
+    app.kubernetes.io/instance: argotails-controller
+spec:
+  ports:
+    - name: metrics
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+      appProtocol: prometheus
+  selector:
+    app.kubernetes.io/instance: argotails-controller
+  type: ClusterIP

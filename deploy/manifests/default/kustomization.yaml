@@ -1,0 +1,29 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+labels:
+  - pairs:
+      app.kubernetes.io/name: argotails
+    includeSelectors: true
+    includeTemplates: true
+  - pairs:
+      app.kubernetes.io/part-of: argotails
+    includeSelectors: false
+    includeTemplates: true
+
+resources:
+  - argotails.deployment.yaml
+  - argotails.rbac.yaml
+# NOTE: example of how to use patches to modify the deployment
+# patches:
+#   - patch: |
+#       - op: replace
+#         path: /spec/template/spec/containers/0/args/1
+#         value: --ts.device-filter=k8s-operator # NOTE: this tag is the default one defined in Tailscale documentation
+#       - op: replace
+#         path: /spec/template/spec/containers/0/env/0/value
+#         value: example.ts.net # NOTE: this is a placeholder, replace with your Tailscale tailnet
+#     target:
+#       name: argotails
+#       kind: Deployment

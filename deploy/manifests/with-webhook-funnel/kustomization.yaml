@@ -1,0 +1,42 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+labels:
+  - pairs:
+      app.kubernetes.io/name: argotails
+    includeSelectors: true
+    includeTemplates: true
+  - pairs:
+      app.kubernetes.io/part-of: argotails
+    includeSelectors: false
+    includeTemplates: true
+
+resources:
+  - ../default
+  - argotails.ingress.yaml
+
+patches:
+  - patch: |
+      - op: add
+        path: /spec/template/spec/containers/0/args/-
+        value: --ts.webhook.enable
+      - op: add
+        path: /spec/template/spec/containers/0/args/-
+        value: --ts.webhook.secret-file=/run/secrets/argotails/webhook-secret
+      - op: add
+        path: /spec/template/spec/containers/0/ports/-
+        value: 
+          containerPort: 3000
+          name: webhook
+          protocol: TCP
+    # NOTE: example of how to use patches to modify the deployment
+    #   - op: replace
+    #     path: /spec/template/spec/containers/0/args/1
+    #     value: --ts.device-filter=k8s-operator # NOTE: this tag is the default one defined in Tailscale documentation
+    #   - op: replace
+    #     path: /spec/template/spec/containers/0/env/0/value
+    #     value: example.ts.net # NOTE: this is a placeholder, replace with your Tailscale tailnet
+    target:
+      name: argotails
+      kind: Deployment
