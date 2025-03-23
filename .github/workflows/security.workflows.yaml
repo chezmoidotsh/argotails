@@ -1,0 +1,30 @@
+name: 🔒️ Security hardening (Github Actions workflows)
+
+on:
+  merge_group: {}
+  pull_request:
+    types: [opened, synchronize]
+    paths: [.github/workflows/**]
+
+permissions: {}
+
+jobs:
+  ci_harden_security:
+    name: 🔒️ Github Action security hardening
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: ⬇️ Checkout repository
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+
+      - name: 📄 Lint Github Actions
+        run: |
+          curl -O https://raw.githubusercontent.com/rhysd/actionlint/4f6274a8e0f4f4d2057aa9ae07660f61aa29c5f3/.github/actionlint-matcher.json
+
+          echo "::add-matcher::actionlint-matcher.json"
+          bash <(curl https://raw.githubusercontent.com/rhysd/actionlint/4f6274a8e0f4f4d2057aa9ae07660f61aa29c5f3/scripts/download-actionlint.bash)
+          ./actionlint -color
+
+      - name: ✅ Ensure SHA pinned actions
+        uses: zgosalvez/github-actions-ensure-sha-pinned-actions@40e45e738b3cad2729f599d8afc6ed02184e1dbd # v3

@@ -1,0 +1,14 @@
+---
+changelog:
+  categories:
+    - title: 🚀 Features
+      labels:
+        - pr::feature
+    - title: 🐛 Bug Fixes
+      labels:
+        - pr::bugfix
+    - title: 📦 Dependencies
+      labels:
+        - pr::dependencies
+    - title: ⚙️ Others changes
+      labels: ["*"]

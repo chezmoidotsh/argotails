@@ -1,0 +1,25 @@
+---
+name: ♻️ Refresh Trunk cache
+
+on:
+  push:
+    branches: [main]
+    paths: [.trunk/trunk.yaml]
+
+permissions: {}
+
+jobs:
+  trunk-cache:
+    name: ♻️ Refresh Trunk cache
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: write
+
+    steps:
+      - name: ⬇️ Checkout repository
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+      - name: 📦️ Populate cache with Trunk
+        uses: trunk-io/trunk-action@86b68ffae610a05105e90b1f52ad8c549ef482c2 # v1.1.16
+        with:
+          check-mode: populate_cache_only

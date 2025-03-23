@@ -1,0 +1,38 @@
+---
+# Define automatically the `pr` label based on the changed files and the head branch
+pr::bugfix:
+  - head-branch:
+      - ^bug(fix(es)?)?/.+$
+
+pr::dependencies:
+  - head-branch:
+      - ^renovate\/.+$
+
+pr::documentation:
+  - changed-files:
+      - any-glob-to-any-file: [README.md, LICENSE, docs/**]
+
+pr::feature:
+  - head-branch:
+      - ^feat(ures?)?/.+$
+
+pr::workflows:
+  - all:
+      - changed-files:
+          - any-glob-to-any-file: [.github/workflows/**]
+      - head-branch:
+          - ^(?!renovate\/).+$
+
+pr::others:
+  - all:
+      - changed-files:
+          - any-glob-to-any-file: "**"
+          - all-globs-to-all-files:
+              - "!.github/workflows/**"
+              - "!deploy/**"
+              - "!go.mod"
+              - "!go.sum"
+              - "!LICENSE"
+              - "!README.md"
+      - head-branch:
+          - ^(?!renovate\/).+$

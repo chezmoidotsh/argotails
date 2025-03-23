@@ -1,0 +1,37 @@
+name: 🐹 Build Argotails
+
+on:
+  merge_group: {}
+  pull_request:
+    types: [opened, synchronize]
+    paths:
+      - "**/*.go"
+      - go.mod
+      - go.sum
+      - .github/workflows/pull_request,push.go.yaml
+  push:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.action }}-${{ github.event.pull_request.id }}
+  cancel-in-progress: true
+permissions: {}
+
+jobs:
+  go-test:
+    name: 🧪 Test for go '${{ matrix.go }}' on '${{ matrix.os }}'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: true
+      matrix:
+        go: [1.23]
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      - name: 🚧 Setup Golang ${{ matrix.go }}
+        uses: actions/setup-go@0c52d547c9bc32b1aa3301fd7a9cb496313a4491 # renovate: tag=v5.0.0
+        with:
+          go-version: ${{ matrix.go }}
+      - name: ⬇️ Checkout repository
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - name: 🧪 Run all tests on ${{ matrix.os }}
+        run: go test -v -race ./...

@@ -32,6 +32,7 @@
     pkgs.trunk-io
 
     # - Miscellaneous tools
+    pkgs.act
     pkgs.bash
     pkgs.tailscale
   ];
