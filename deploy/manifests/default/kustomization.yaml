@@ -30,5 +30,5 @@ resources:
 
 images:
   - name: ghcr.io/chezmoi-sh/argotails
-    newTag: v0.1.1
-    digest: {{ steps.publish.outputs.digest }}
+    newTag: v0.1.2
+    digest: sha256:d1cc649375faf7dd1a00a52317ff87891c22f730256667e5970518fafe6a7140
