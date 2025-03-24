@@ -21,19 +21,19 @@ import (
 
 const (
 	// AnnotationDeviceID is the annotation key for the device ID.
-	AnnotationDeviceID = "device.tailscale.io/id"
+	AnnotationDeviceID = "device.tailscale.com/id"
 	// AnnotationDeviceHostname is the annotation key for the device hostname.
-	AnnotationDeviceHostname = "device.tailscale.io/hostname"
+	AnnotationDeviceHostname = "device.tailscale.com/hostname"
 	// AnnotationDeviceTailnet is the annotation key for the device name.
-	AnnotationDeviceTailnet = "device.tailscale.io/tailnet"
+	AnnotationDeviceTailnet = "device.tailscale.com/tailnet"
 
 	// LabelDeviceOS is the label key for the device OS.
-	LabelDeviceOS = "device.tailscale.io/os"
+	LabelDeviceOS = "device.tailscale.com/os"
 	// LabelDeviceVersion is the label key for the device version.
-	LabelDeviceVersion = "device.tailscale.io/version"
+	LabelDeviceVersion = "device.tailscale.com/version"
 
 	// LabelDeviceTagsPrefix is the label key prefix used for the device tags.
-	LabelDeviceTagsPrefix = "tag.device.tailscale.io/"
+	LabelDeviceTagsPrefix = "tag.device.tailscale.com/"
 )
 
 // regex to extract the tailnet from the device name
