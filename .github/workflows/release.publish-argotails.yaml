@@ -100,6 +100,18 @@ jobs:
         env:
           SOURCE_DATE_EPOCH: ${{ env.SOURCE_DATE_EPOCH }}
 
+      - name: 📝 Update `deploy/manifests` image
+        run: |
+          sed -i 's|newTag: .*|newTag: ${{ inputs.release-tag }}|' deploy/manifests/default/kustomization.yaml
+          sed -i 's|digest: .*|digest: {{ steps.publish.outputs.digest }}|' deploy/manifests/default/kustomization.yaml
+      - name: 📦 Commit updated `deploy/manifests` image
+        uses: EndBug/add-and-commit@a94899bca583c204427a224a7af87c02f9b325d5 # v9.1.4
+        with:
+          add: deploy/manifests/default/kustomization.yaml
+          commit: --signoff
+          message: ":package:: Update image digest to ${{ steps.publish.outputs.digest }}"
+          push: ${{ inputs.dry-run == false }}
+
       - name: 📦 Create a Github release
         if: ${{ inputs.dry-run == false }}
         env:
