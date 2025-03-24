@@ -22,6 +22,8 @@ import (
 const (
 	// AnnotationDeviceID is the annotation key for the device ID.
 	AnnotationDeviceID = "device.tailscale.io/id"
+	// AnnotationDeviceHostname is the annotation key for the device hostname.
+	AnnotationDeviceHostname = "device.tailscale.io/hostname"
 	// AnnotationDeviceTailnet is the annotation key for the device name.
 	AnnotationDeviceTailnet = "device.tailscale.io/tailnet"
 
@@ -86,10 +88,11 @@ func (r reconciler) Reconcile(ctx context.Context, req reconcile.Request) (recon
 		if _device.Name == req.Name {
 			device = &_device
 			log = log.WithValues("device", map[string]any{
-				"id":      _device.NodeID,
-				"name":    _device.Name,
-				"os":      _device.OS,
-				"version": _device.ClientVersion,
+				"id":       _device.NodeID,
+				"name":     _device.Name,
+				"os":       _device.OS,
+				"hostname": _device.Hostname,
+				"version":  _device.ClientVersion,
 			})
 			log.V(2).Info("Found matching Tailscale device")
 			break
@@ -148,7 +151,8 @@ func (r reconciler) CreateDeviceSecret(ctx context.Context, namespacedName types
 			Name:      device.Name,
 			Namespace: "default",
 			Annotations: map[string]string{
-				AnnotationDeviceID: device.NodeID,
+				AnnotationDeviceID:       device.NodeID,
+				AnnotationDeviceHostname: device.Hostname,
 			},
 			Labels: map[string]string{
 				"argocd.argoproj.io/secret-type": "cluster",
@@ -191,6 +195,7 @@ func (r reconciler) UpdateDeviceSecret(ctx context.Context, namespacedName types
 
 	// Update secret metadata
 	secret.Annotations[AnnotationDeviceID] = device.NodeID
+	secret.Annotations[AnnotationDeviceHostname] = device.Hostname
 	secret.Labels["argocd.argoproj.io/secret-type"] = "cluster"
 	secret.Labels["apps.kubernetes.io/managed-by"] = r.managedBy
 	secret.Labels[LabelDeviceOS] = device.OS

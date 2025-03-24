@@ -41,6 +41,7 @@ func (suite *ReconcilerSuite) TestReconcile_NewDevice() {
 			"devices": []tailscale.Device{
 				{
 					Name:          "A.fake.ts.net",
+					Hostname:      "A",
 					NodeID:        "fake-device-id",
 					OS:            "linux",
 					ClientVersion: "v1.2.3",
@@ -65,6 +66,7 @@ func (suite *ReconcilerSuite) TestReconcile_NewDevice() {
 	suite.Require().NoError(err)
 
 	suite.Equal("fake-device-id", secret.Annotations[AnnotationDeviceID])
+	suite.Equal("A", secret.Annotations[AnnotationDeviceHostname])
 	suite.Equal("fake.ts.net", secret.Annotations[AnnotationDeviceTailnet])
 	suite.Equal("cluster", secret.Labels["argocd.argoproj.io/secret-type"])
 	suite.Equal(managedBy, secret.Labels["apps.kubernetes.io/managed-by"])
@@ -84,8 +86,9 @@ func (suite *ReconcilerSuite) TestReconcile_ExistingDevice() {
 			Name:      "A.fake.ts.net",
 			Namespace: "default",
 			Annotations: map[string]string{
-				AnnotationDeviceID:      "fake-device-id",
-				AnnotationDeviceTailnet: "fake.ts.net",
+				AnnotationDeviceID:       "fake-device-id",
+				AnnotationDeviceHostname: "A",
+				AnnotationDeviceTailnet:  "fake.ts.net",
 			},
 			Labels: map[string]string{
 				"argocd.argoproj.io/secret-type": "cluster",
@@ -105,6 +108,7 @@ func (suite *ReconcilerSuite) TestReconcile_ExistingDevice() {
 			"devices": []tailscale.Device{
 				{
 					Name:          "A.fake.ts.net",
+					Hostname:      "A",
 					NodeID:        "fake-device-id",
 					OS:            "linux",
 					ClientVersion: "v1.2.3",
@@ -129,6 +133,7 @@ func (suite *ReconcilerSuite) TestReconcile_ExistingDevice() {
 	suite.Require().NoError(err)
 
 	suite.Equal("fake-device-id", secret.Annotations[AnnotationDeviceID])
+	suite.Equal("A", secret.Annotations[AnnotationDeviceHostname])
 	suite.Equal("fake.ts.net", secret.Annotations[AnnotationDeviceTailnet])
 	suite.Equal("cluster", secret.Labels["argocd.argoproj.io/secret-type"])
 	suite.Equal(managedBy, secret.Labels["apps.kubernetes.io/managed-by"])
@@ -165,6 +170,7 @@ func (suite *ReconcilerSuite) TestReconcile_UpdatedExistingDevice() {
 			"devices": []tailscale.Device{
 				{
 					Name:          "A.fake.ts.net",
+					Hostname:      "A",
 					NodeID:        "fake-device-id",
 					OS:            "linux",
 					ClientVersion: "v1.2.3",
@@ -195,6 +201,7 @@ func (suite *ReconcilerSuite) TestReconcile_UpdatedExistingDevice() {
 	suite.NotEqual("not-linux", secret.Labels[LabelDeviceOS])
 
 	suite.Equal("fake-device-id", secret.Annotations[AnnotationDeviceID])
+	suite.Equal("A", secret.Annotations[AnnotationDeviceHostname])
 	suite.Equal("fake.ts.net", secret.Annotations[AnnotationDeviceTailnet])
 	suite.Equal("cluster", secret.Labels["argocd.argoproj.io/secret-type"])
 	suite.Equal(managedBy, secret.Labels["apps.kubernetes.io/managed-by"])
@@ -272,6 +279,7 @@ func (suite *ReconcilerSuite) TestCreateSecretDevice() {
 		types.NamespacedName{Name: "A.fake.ts.net", Namespace: "default"},
 		tailscale.Device{
 			Name:          "A.fake.ts.net",
+			Hostname:      "A",
 			NodeID:        "fake-device-id",
 			OS:            "linux",
 			ClientVersion: "v1.2.3",
@@ -286,6 +294,7 @@ func (suite *ReconcilerSuite) TestCreateSecretDevice() {
 	suite.Require().NoError(err)
 
 	suite.Equal("fake-device-id", secret.Annotations[AnnotationDeviceID])
+	suite.Equal("A", secret.Annotations[AnnotationDeviceHostname])
 	suite.Equal("fake.ts.net", secret.Annotations[AnnotationDeviceTailnet])
 	suite.Equal("cluster", secret.Labels["argocd.argoproj.io/secret-type"])
 	suite.Equal(managedBy, secret.Labels["apps.kubernetes.io/managed-by"])
@@ -324,6 +333,7 @@ func (suite *ReconcilerSuite) TestUpdateSecretDevice() {
 		types.NamespacedName{Name: "A.fake.ts.net", Namespace: "default"},
 		tailscale.Device{
 			Name:          "A.fake.ts.net",
+			Hostname:      "A",
 			NodeID:        "fake-device-id",
 			OS:            "linux",
 			ClientVersion: "v1.2.3",
@@ -344,6 +354,7 @@ func (suite *ReconcilerSuite) TestUpdateSecretDevice() {
 	suite.NotEqual("initial-device-os", secret.Labels[LabelDeviceOS])
 
 	suite.Equal("fake-device-id", secret.Annotations[AnnotationDeviceID])
+	suite.Equal("A", secret.Annotations[AnnotationDeviceHostname])
 	suite.Equal("fake.ts.net", secret.Annotations[AnnotationDeviceTailnet])
 	suite.Equal("cluster", secret.Labels["argocd.argoproj.io/secret-type"])
 	suite.Equal(managedBy, secret.Labels["apps.kubernetes.io/managed-by"])
