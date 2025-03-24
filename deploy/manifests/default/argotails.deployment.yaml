@@ -2,6 +2,8 @@
 # trunk-ignore-all(checkov/CKV_K8S_38): This is required for Argotails as it is a Kubernetes controller
 # trunk-ignore-all(checkov/CKV_K8S_43,checkov/CKV_K8S_14): The image is managed by Kustomize and the kustomization.yaml
 # trunk-ignore-all(checkov/CKV2_K8S_6): Network policies must be defined by the end-user as they are specific to the environment
+
+# trunk-ignore-all(checkov/CKV_K8S_8,checkov/CKV_K8S_9): Liveness and readiness probes are not yet implemented in Argotails [TODO]
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -24,36 +26,39 @@ spec:
       automountServiceAccountToken: true
       containers:
         - args:
-            - --ts.auth-key-file=/run/secrets/argotails/authkey
+            - run
+            - --ts.authkey-file=/run/secrets/argotails/authkey
             - --ts.device-filter=k8s-operator # NOTE: this tag is the default one defined in Tailscale documentation
           env:
             - name: TAILSCALE_TAILNET
               value: example.ts.net # NOTE: this is a placeholder, replace with your Tailscale tailnet
           image: ghcr.io/chezmoi-sh/argotails:latest
           imagePullPolicy: Always
-          livenessProbe:
-            failureThreshold: 3
-            httpGet:
-              path: /livez
-              port: 8080
-              scheme: HTTP
-            initialDelaySeconds: 5
-            periodSeconds: 10
-            timeoutSeconds: 1
+          # TODO: readiness/liveness probes are not yet implemented in Argotails
+          # livenessProbe:
+          #   failureThreshold: 3
+          #   httpGet:
+          #     path: /livez
+          #     port: 8080
+          #     scheme: HTTP
+          #   initialDelaySeconds: 5
+          #   periodSeconds: 10
+          #   timeoutSeconds: 1
           name: argotails
           ports:
             - containerPort: 8080
               name: metrics
               protocol: TCP
-          readinessProbe:
-            failureThreshold: 3
-            httpGet:
-              path: /readyz
-              port: 8080
-              scheme: HTTP
-            initialDelaySeconds: 5
-            periodSeconds: 10
-            timeoutSeconds: 1
+          # TODO: readiness/liveness probes are not yet implemented in Argotails
+          # readinessProbe:
+          #   failureThreshold: 3
+          #   httpGet:
+          #     path: /readyz
+          #     port: 8080
+          #     scheme: HTTP
+          #   initialDelaySeconds: 5
+          #   periodSeconds: 10
+          #   timeoutSeconds: 1
           resources:
             limits:
               cpu: 500m
