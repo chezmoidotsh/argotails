@@ -105,6 +105,7 @@ jobs:
           sed -i 's|newTag: .*|newTag: ${{ inputs.release-tag }}|' deploy/manifests/default/kustomization.yaml
           sed -i 's|digest: .*|digest: ${{ steps.publish.outputs.digest }}|' deploy/manifests/default/kustomization.yaml
       - name: 📦 Commit updated `deploy/manifests` image
+        id: commit
         uses: EndBug/add-and-commit@a94899bca583c204427a224a7af87c02f9b325d5 # v9.1.4
         with:
           add: deploy/manifests/default/kustomization.yaml
@@ -119,6 +120,6 @@ jobs:
         run: |
           gh release create "${{ inputs.release-tag }}" \
             --title "Argotails - ${{ inputs.release-tag }}" \
-            --target "${{ github.sha }}" \
+            --target "${{ steps.commit.outputs.commit_long_sha }}" \
             --generate-notes \
             --draft
