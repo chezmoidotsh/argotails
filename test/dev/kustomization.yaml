@@ -1,0 +1,46 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: argocd-dev
+
+labels:
+  - pairs:
+      app.kubernetes.io/name: argotails
+    includeSelectors: true
+    includeTemplates: true
+  - pairs:
+      app.kubernetes.io/part-of: argotails
+    includeSelectors: false
+    includeTemplates: true
+
+resources:
+  - namespace.yaml
+  - ../../deploy/manifests/default
+
+patches:
+  - patch: |
+      # Enable the development mode for the Argotails container
+      - op: add
+        path: /spec/template/spec/containers/0/args/-
+        value: --log.devel
+
+      # WARN: Only devices with the tag "argotails-dev" will be filtered to avoid conflicts with
+      #       `k8s-operator` tagged devices on an existing tailnet
+      - op: replace
+        path: /spec/template/spec/containers/0/args/2
+        value: --ts.device-filter=argotails-dev # NOTE: this tag is the default one defined in Tailscale documentation
+      - op: remove
+        path: /spec/template/spec/containers/0/env/0/value
+      - op: add
+        path: /spec/template/spec/containers/0/env/0/valueFrom
+        value:
+          secretKeyRef:
+            key: tailnet
+            name: argotails-secrets
+    target:
+      name: argotails
+      kind: Deployment
+
+images:
+  - name: ghcr.io/chezmoi-sh/argotails
+    newTag: dev

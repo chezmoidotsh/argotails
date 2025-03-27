@@ -1,0 +1,9 @@
+# Ignore everything ...
+*
+
+# ... except files required for the build
+!.git/
+!**/*.go
+!go.mod
+!go.sum
+!LICENSE

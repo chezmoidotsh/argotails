@@ -32,7 +32,7 @@ patches:
           protocol: TCP
     # NOTE: example of how to use patches to modify the deployment
     #   - op: replace
-    #     path: /spec/template/spec/containers/0/args/1
+    #     path: /spec/template/spec/containers/0/args/2
     #     value: --ts.device-filter=k8s-operator # NOTE: this tag is the default one defined in Tailscale documentation
     #   - op: replace
     #     path: /spec/template/spec/containers/0/env/0/value
