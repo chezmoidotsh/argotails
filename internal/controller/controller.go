@@ -19,15 +19,16 @@ import (
 	"go.uber.org/zap/zapcore"
 	"golang.org/x/sync/errgroup"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
+	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
 	ctrllog "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 	"sigs.k8s.io/controller-runtime/pkg/manager/signals"
-	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 	"tailscale.com/client/tailscale/v2"
 
@@ -55,9 +56,7 @@ type (
 			} `embed:"" prefix:"webhook."`
 		} `embed:"" prefix:"ts."`
 
-		ArgoCD struct {
-			Namespace string `name:"namespace" help:"Namespace where ArgoCD is installed (if the controller is runned outside a cluster)." env:"ARGOCD_NAMESPACE" group:"ArgoCD flags"`
-		} `embed:"" prefix:"argocd."`
+		Namespace string `name:"namespace" help:"Namespace where ArgoCD cluster secret must be created (configure it only if Argotails runs outside the cluster)." env:"NAMESPACE"` // trunk-ignore(golangci-lint/lll)
 
 		Log struct {
 			Development bool                 `name:"devel" help:"Enable development logging." env:"DEVEL" group:"Log flags"`
@@ -89,12 +88,12 @@ func (c *RunCmd) AfterApply() error {
 	if c.Tailscale.Webhook.SecretFile != nil {
 		c.Tailscale.Webhook.Secret = string(c.Tailscale.Webhook.SecretFile)
 	}
-	if c.ArgoCD.Namespace == "" {
+	if c.Namespace == "" {
 		ns, _ := os.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/namespace")
 		if len(ns) == 0 {
-			return fmt.Errorf("--argocd.namespace is required when running outside a cluster or service account not mounted")
+			return errors.New("--namespace is required when running outside a cluster or service account not mounted")
 		}
-		c.ArgoCD.Namespace = string(ns)
+		c.Namespace = string(ns)
 	}
 	return nil
 }
@@ -137,6 +136,15 @@ func (c *RunCmd) Run(cli *kong.Context) error {
 	// Configure the controller manager.
 	log.V(1).Info("Initializing controller manager")
 	c.mgr, err = manager.New(config.GetConfigOrDie(), manager.Options{
+		Cache: cache.Options{
+			DefaultNamespaces: map[string]cache.Config{
+				// Argotails controller must only watch secrets managed by itself inside the configured namespace
+				// (or the namespace where it runs if it's running inside a Kubernetes cluster). This ensures that
+				// the controller will not interfere with other controllers or resources and will not read secrets
+				// from other namespaces.
+				c.Namespace: {LabelSelector: labels.SelectorFromSet(labels.Set{"apps.kubernetes.io/managed-by": c.ctrlName})},
+			},
+		},
 		BaseContext: func() context.Context { return ctx },
 		Logger:      log,
 	})
@@ -192,13 +200,6 @@ func (c *RunCmd) kubernetesReconcilationLoop(ctx context.Context) error {
 		WithLogConstructor(func(r *reconcile.Request) logr.Logger {
 			return log.WithValues("secret", r)
 		}).
-		WithEventFilter(predicate.NewPredicateFuncs(func(object client.Object) bool {
-			// Filter out secrets that are not in the ArgoCD namespace
-			isManaged := object.GetNamespace() == c.ArgoCD.Namespace && object.GetLabels()["apps.kubernetes.io/managed-by"] == c.ctrlName
-
-			log.V(7).Info("New object event received", "object", object, "filter.match", isManaged)
-			return isManaged
-		})).
 		Complete(c.reconciler)
 
 	if err != nil {
@@ -247,7 +248,7 @@ func (c *RunCmd) timeBasedReconciliationLoop(ctx context.Context, filter tsutils
 				deviceToSync[reconcile.Request{
 					NamespacedName: types.NamespacedName{
 						Name:      device.Name,
-						Namespace: c.ArgoCD.Namespace,
+						Namespace: c.Namespace,
 					},
 				}] = struct{}{}
 			} else {
@@ -267,7 +268,7 @@ func (c *RunCmd) timeBasedReconciliationLoop(ctx context.Context, filter tsutils
 		err = c.mgr.GetClient().List(
 			ctx,
 			&existingSecrets,
-			client.InNamespace(c.ArgoCD.Namespace),
+			client.InNamespace(c.Namespace),
 			client.MatchingLabels{"apps.kubernetes.io/managed-by": c.ctrlName},
 		)
 		if err != nil {
@@ -400,7 +401,7 @@ func (c *RunCmd) webhookReconciliationLoop(ctx context.Context) error {
 			_, err = c.reconciler.Reconcile(ctrllog.IntoContext(ctx, log), reconcile.Request{
 				NamespacedName: types.NamespacedName{
 					Name:      event.Data.DeviceName,
-					Namespace: c.ArgoCD.Namespace,
+					Namespace: c.Namespace,
 				},
 			})
 
