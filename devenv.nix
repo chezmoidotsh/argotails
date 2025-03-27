@@ -2,6 +2,9 @@
 
 {
   # -- Environment variables
+  # Fortify is disabled to avoid compilation issues with some Go dependencies
+  env.hardeningDisable = [ "fortify" ];
+
   env.DFT_SKIP_UNCHANGED = "true";
 
   env.HELM_CACHE_HOME = "${config.env.DEVENV_ROOT}/.direnv/helm/cache";
@@ -17,15 +20,17 @@
     pkgs.pack
     pkgs.helm-docs
     pkgs.k3d
+    pkgs.k9s
     pkgs.kubectl
     pkgs.kubernetes-helm
-    pkgs.tilt
 
     # - Development tools
     pkgs.air
+    pkgs.ctlptl
     pkgs.just
     pkgs.mise
     pkgs.runme
+    pkgs.tilt
 
     # - Quality assurance tools
     pkgs.commitlint
@@ -39,10 +44,7 @@
 
   # -- Customizations
   languages.go.enable = true;
-  languages.go.package = pkgs.go;
   languages.nix.enable = true;
-  languages.python.enable = true;
-  languages.python.directory = "${config.env.DEVENV_ROOT}/.direnv/python";
 
   devcontainer.enable = true;
   devcontainer.settings.customizations.vscode.extensions = [
@@ -58,12 +60,14 @@
   scripts.motd.exec = ''
       cat <<EOF
     ────────────────────────────────────────────────────────────────────────────────
-    👋 Welcome to the ??? development environment !
-    This space contains everything required to contribute to the ??? project.
+    👋 Welcome to the Argotails development environment !
+    This space contains everything required to contribute to the Argotails project.
 
     📚 No documentation has been written yet ... but it is planned
-    🚀 How to build or update the infrastructure ?
-    - You can't.... nothing is ready yet
+    🚀 How to start my development experience?
+      1. Run \`ctlptl apply -f test/dev/argotails-dev.ctpl.yaml\` to deploy the local Kubernetes cluster
+      2. Run \`tilt up\` to start the Tilt development environment
+      3. Start hacking on the code and see the changes live-reloaded in the Kubernetes cluster
     ────────────────────────────────────────────────────────────────────────────────
     EOF
   '';

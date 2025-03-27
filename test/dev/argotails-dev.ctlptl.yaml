@@ -1,0 +1,11 @@
+---
+apiVersion: ctlptl.dev/v1alpha1
+kind: Registry
+name: argotails-registry
+port: 39254
+---
+apiVersion: ctlptl.dev/v1alpha1
+kind: Cluster
+product: k3d
+name: k3d-argotails
+registry: argotails-registry
