@@ -198,6 +198,9 @@ func (c *RunCmd) kubernetesReconcilationLoop(ctx context.Context) error {
 		Named(c.ctrlName).
 		For(&corev1.Secret{}).
 		WithLogConstructor(func(r *reconcile.Request) logr.Logger {
+			if r == nil {
+				return log
+			}
 			return log.WithValues("secret", r)
 		}).
 		Complete(c.reconciler)
