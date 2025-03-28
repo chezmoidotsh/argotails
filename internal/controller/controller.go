@@ -102,16 +102,17 @@ func (c *RunCmd) Run(cli *kong.Context) error {
 	c.ctrlName = cli.Model.Name
 
 	// Initialize the logger and context
-	log := zap.New(
+	zopts := []zap.Opts{
 		zap.UseFlagOptions(&zap.Options{
 			TimeEncoder: zapcore.ISO8601TimeEncoder,
 		}),
 		zap.Level(c.Log.Verbosity),
 		zap.Encoder(c.Log.Format),
-	)
-	if c.Log.Development {
-		log = zap.New(zap.UseDevMode(true))
 	}
+	if c.Log.Development {
+		zopts = []zap.Opts{zap.UseDevMode(true), zap.Level(zapcore.Level(-127))}
+	}
+	log := zap.New(zopts...)
 	ctrllog.SetLogger(log)
 	ctx := ctrllog.IntoContext(signals.SetupSignalHandler(), log)
 
@@ -198,6 +199,9 @@ func (c *RunCmd) kubernetesReconcilationLoop(ctx context.Context) error {
 		Named(c.ctrlName).
 		For(&corev1.Secret{}).
 		WithLogConstructor(func(r *reconcile.Request) logr.Logger {
+			if r == nil {
+				return log
+			}
 			return log.WithValues("secret", r)
 		}).
 		Complete(c.reconciler)
