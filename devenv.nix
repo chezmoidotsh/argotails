@@ -55,6 +55,9 @@
     "tilt-dev.tiltfile"
     "trunk.io"
   ];
+  devcontainer.settings.features = {
+    "ghcr.io/devcontainers/features/docker-in-docker:2.12.1" = {};
+  };
   difftastic.enable = true;
 
   scripts.motd.exec = ''
@@ -74,6 +77,7 @@
 
   enterShell = ''
     # Show MOTD only once, when the environment is built
+    mkdir --parent "${config.env.DEVENV_ROOT}/.direnv"
     find "${config.env.DEVENV_ROOT}/.direnv/motd" -type f -mtime +0 -exec rm {} \; 2> /dev/null
     test -f "${config.env.DEVENV_ROOT}/.direnv/motd" || motd | tee "${config.env.DEVENV_ROOT}/.direnv/motd"
   '';
