@@ -1,3 +1,5 @@
+/* trunk-ignore-all(golangci-lint/lll): Don't care about lll here */
+/* trunk-ignore(golangci-lint/testpackage): Need to access to the internal reconciler type */
 package reconciler
 
 import (
@@ -55,14 +57,14 @@ func (suite *ReconcilerSuite) TestReconcile_NewDevice() {
 
 	res, err := suite.reconciler.Reconcile(
 		context.TODO(),
-		reconcile.Request{NamespacedName: types.NamespacedName{Name: "A.fake.ts.net", Namespace: "default"}},
+		reconcile.Request{NamespacedName: types.NamespacedName{Name: "A.fake.ts.net", Namespace: "argocd"}},
 	)
 	suite.Require().NoError(err)
 	suite.Equal(reconcile.Result{}, res)
 
 	// Check the device secret freshly created.
 	var secret corev1.Secret
-	err = suite.kubernetesMock.Get(context.TODO(), types.NamespacedName{Name: "A.fake.ts.net", Namespace: "default"}, &secret)
+	err = suite.kubernetesMock.Get(context.TODO(), types.NamespacedName{Name: "A.fake.ts.net", Namespace: "argocd"}, &secret)
 	suite.Require().NoError(err)
 
 	suite.Equal("fake-device-id", secret.Annotations[AnnotationDeviceID])
@@ -84,7 +86,7 @@ func (suite *ReconcilerSuite) TestReconcile_ExistingDevice() {
 	err := suite.kubernetesMock.Create(context.TODO(), &corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "A.fake.ts.net",
-			Namespace: "default",
+			Namespace: "argocd",
 			Annotations: map[string]string{
 				AnnotationDeviceID:       "fake-device-id",
 				AnnotationDeviceHostname: "A",
@@ -122,14 +124,14 @@ func (suite *ReconcilerSuite) TestReconcile_ExistingDevice() {
 
 	res, err := suite.reconciler.Reconcile(
 		context.TODO(),
-		reconcile.Request{NamespacedName: types.NamespacedName{Name: "A.fake.ts.net", Namespace: "default"}},
+		reconcile.Request{NamespacedName: types.NamespacedName{Name: "A.fake.ts.net", Namespace: "argocd"}},
 	)
 	suite.Require().NoError(err)
 	suite.Equal(reconcile.Result{}, res)
 
 	// Check the device secret freshly created.
 	var secret corev1.Secret
-	err = suite.kubernetesMock.Get(context.TODO(), types.NamespacedName{Name: "A.fake.ts.net", Namespace: "default"}, &secret)
+	err = suite.kubernetesMock.Get(context.TODO(), types.NamespacedName{Name: "A.fake.ts.net", Namespace: "argocd"}, &secret)
 	suite.Require().NoError(err)
 
 	suite.Equal("fake-device-id", secret.Annotations[AnnotationDeviceID])
@@ -151,7 +153,7 @@ func (suite *ReconcilerSuite) TestReconcile_UpdatedExistingDevice() {
 	err := suite.kubernetesMock.Create(context.TODO(), &corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "A.fake.ts.net",
-			Namespace: "default",
+			Namespace: "argocd",
 			Annotations: map[string]string{
 				"existing-annotation": "true",
 				AnnotationDeviceID:    "not-fake-device-id",
@@ -184,14 +186,14 @@ func (suite *ReconcilerSuite) TestReconcile_UpdatedExistingDevice() {
 
 	res, err := suite.reconciler.Reconcile(
 		context.TODO(),
-		reconcile.Request{NamespacedName: types.NamespacedName{Name: "A.fake.ts.net", Namespace: "default"}},
+		reconcile.Request{NamespacedName: types.NamespacedName{Name: "A.fake.ts.net", Namespace: "argocd"}},
 	)
 	suite.Require().NoError(err)
 	suite.Equal(reconcile.Result{}, res)
 
 	// Check the device secret freshly created.
 	var secret corev1.Secret
-	err = suite.kubernetesMock.Get(context.TODO(), types.NamespacedName{Name: "A.fake.ts.net", Namespace: "default"}, &secret)
+	err = suite.kubernetesMock.Get(context.TODO(), types.NamespacedName{Name: "A.fake.ts.net", Namespace: "argocd"}, &secret)
 	suite.Require().NoError(err)
 
 	// Note: The existing annotation and label are preserved if they are not one of the device metadata.
@@ -219,7 +221,7 @@ func (suite *ReconcilerSuite) TestReconcile_DeletedDevice() {
 	err := suite.kubernetesMock.Create(context.TODO(), &corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:        "A.fake.ts.net",
-			Namespace:   "default",
+			Namespace:   "argocd",
 			Annotations: map[string]string{},
 		},
 	})
@@ -236,14 +238,14 @@ func (suite *ReconcilerSuite) TestReconcile_DeletedDevice() {
 
 	res, err := suite.reconciler.Reconcile(
 		context.TODO(),
-		reconcile.Request{NamespacedName: types.NamespacedName{Name: "A.fake.ts.net", Namespace: "default"}},
+		reconcile.Request{NamespacedName: types.NamespacedName{Name: "A.fake.ts.net", Namespace: "argocd"}},
 	)
 	suite.Require().NoError(err)
 	suite.Equal(reconcile.Result{}, res)
 
 	// Check the device secret freshly created.
 	var secret corev1.Secret
-	err = suite.kubernetesMock.Get(context.TODO(), types.NamespacedName{Name: "A.fake.ts.net", Namespace: "default"}, &secret)
+	err = suite.kubernetesMock.Get(context.TODO(), types.NamespacedName{Name: "A.fake.ts.net", Namespace: "argocd"}, &secret)
 	suite.Error(err)
 	suite.True(errors.IsNotFound(err))
 }
@@ -260,14 +262,14 @@ func (suite *ReconcilerSuite) TestReconcile_DeleteNonExistingDevice() {
 
 	res, err := suite.reconciler.Reconcile(
 		context.TODO(),
-		reconcile.Request{NamespacedName: types.NamespacedName{Name: "A.fake.ts.net", Namespace: "default"}},
+		reconcile.Request{NamespacedName: types.NamespacedName{Name: "A.fake.ts.net", Namespace: "argocd"}},
 	)
 	suite.Require().NoError(err)
 	suite.Equal(reconcile.Result{}, res)
 
 	// Check the device secret freshly created.
 	var secret corev1.Secret
-	err = suite.kubernetesMock.Get(context.TODO(), types.NamespacedName{Name: "A.fake.ts.net", Namespace: "default"}, &secret)
+	err = suite.kubernetesMock.Get(context.TODO(), types.NamespacedName{Name: "A.fake.ts.net", Namespace: "argocd"}, &secret)
 	suite.Error(err)
 	suite.True(errors.IsNotFound(err))
 }
@@ -276,7 +278,7 @@ func (suite *ReconcilerSuite) TestCreateSecretDevice() {
 	// Create a new device secret.
 	err := suite.reconciler.CreateDeviceSecret(
 		context.TODO(),
-		types.NamespacedName{Name: "A.fake.ts.net", Namespace: "default"},
+		types.NamespacedName{Name: "A.fake.ts.net", Namespace: "argocd"},
 		tailscale.Device{
 			Name:          "A.fake.ts.net",
 			Hostname:      "A",
@@ -290,7 +292,7 @@ func (suite *ReconcilerSuite) TestCreateSecretDevice() {
 
 	// Check the device secret.
 	var secret corev1.Secret
-	err = suite.kubernetesMock.Get(context.TODO(), types.NamespacedName{Name: "A.fake.ts.net", Namespace: "default"}, &secret)
+	err = suite.kubernetesMock.Get(context.TODO(), types.NamespacedName{Name: "A.fake.ts.net", Namespace: "argocd"}, &secret)
 	suite.Require().NoError(err)
 
 	suite.Equal("fake-device-id", secret.Annotations[AnnotationDeviceID])
@@ -312,7 +314,7 @@ func (suite *ReconcilerSuite) TestUpdateSecretDevice() {
 	err := suite.kubernetesMock.Create(context.TODO(), &corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "A.fake.ts.net",
-			Namespace: "default",
+			Namespace: "argocd",
 			Annotations: map[string]string{
 				"existing-annotation": "true",
 				AnnotationDeviceID:    "initial-device-id",
@@ -330,7 +332,7 @@ func (suite *ReconcilerSuite) TestUpdateSecretDevice() {
 	// Update the device secret.
 	err = suite.reconciler.UpdateDeviceSecret(
 		context.TODO(),
-		types.NamespacedName{Name: "A.fake.ts.net", Namespace: "default"},
+		types.NamespacedName{Name: "A.fake.ts.net", Namespace: "argocd"},
 		tailscale.Device{
 			Name:          "A.fake.ts.net",
 			Hostname:      "A",
@@ -344,7 +346,7 @@ func (suite *ReconcilerSuite) TestUpdateSecretDevice() {
 
 	// Check the device secret.
 	var secret corev1.Secret
-	err = suite.kubernetesMock.Get(context.TODO(), types.NamespacedName{Name: "A.fake.ts.net", Namespace: "default"}, &secret)
+	err = suite.kubernetesMock.Get(context.TODO(), types.NamespacedName{Name: "A.fake.ts.net", Namespace: "argocd"}, &secret)
 	suite.Require().NoError(err)
 
 	// Note: The existing annotation and label are preserved if they are not one of the device metadata.
@@ -372,7 +374,7 @@ func (suite *ReconcilerSuite) TestDeleteSecretDevice() {
 	err := suite.kubernetesMock.Create(context.TODO(), &corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "A.fake.ts.net",
-			Namespace: "default",
+			Namespace: "argocd",
 			Annotations: map[string]string{
 				AnnotationDeviceID: "fake-device-id",
 			},
@@ -381,12 +383,12 @@ func (suite *ReconcilerSuite) TestDeleteSecretDevice() {
 	suite.Require().NoError(err)
 
 	// Delete the device secret.
-	err = suite.reconciler.DeleteDeviceSecret(context.TODO(), types.NamespacedName{Name: "A.fake.ts.net", Namespace: "default"})
+	err = suite.reconciler.DeleteDeviceSecret(context.TODO(), types.NamespacedName{Name: "A.fake.ts.net", Namespace: "argocd"})
 	suite.Require().NoError(err)
 
 	// Check the device secret.
 	var secret corev1.Secret
-	err = suite.kubernetesMock.Get(context.TODO(), types.NamespacedName{Name: "A.fake.ts.net", Namespace: "default"}, &secret)
+	err = suite.kubernetesMock.Get(context.TODO(), types.NamespacedName{Name: "A.fake.ts.net", Namespace: "argocd"}, &secret)
 	suite.Error(err)
 	suite.True(errors.IsNotFound(err))
 }
@@ -407,6 +409,8 @@ func (suite *ReconcilerSuite) SetupTest() {
 	suite.kubernetesMock = ks
 	suite.tailscaleMock = func(w http.ResponseWriter, r *http.Request) { suite.Fail("request not mocked") }
 	suite.reconciler = &reconciler{ts: ts, ks: ks, filter: tsutils.FuncTagFilter(func(_ tailscale.Device) bool { return true }), managedBy: managedBy}
+
+	suite.kubernetesMock.Create(context.Background(), &corev1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: "argocd"}})
 }
 
 func (suite *ReconcilerSuite) TearDownTest() {

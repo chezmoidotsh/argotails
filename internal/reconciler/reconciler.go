@@ -148,8 +148,8 @@ func (r reconciler) CreateDeviceSecret(ctx context.Context, namespacedName types
 
 	secret := corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      device.Name,
-			Namespace: "default",
+			Name:      namespacedName.Name,
+			Namespace: namespacedName.Namespace,
 			Annotations: map[string]string{
 				AnnotationDeviceID:       device.NodeID,
 				AnnotationDeviceHostname: device.Hostname,
