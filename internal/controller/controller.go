@@ -25,6 +25,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
+	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	ctrllog "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
@@ -146,13 +147,25 @@ func (c *RunCmd) Run(cli *kong.Context) error {
 				c.Namespace: {LabelSelector: labels.SelectorFromSet(labels.Set{"apps.kubernetes.io/managed-by": c.ctrlName})},
 			},
 		},
-		BaseContext: func() context.Context { return ctx },
-		Logger:      log,
+		HealthProbeBindAddress: ":8081", // Expose health endpoints
+		BaseContext:            func() context.Context { return ctx },
+		Logger:                 log,
 	})
 	if err != nil {
 		log.Error(err, "Unable to set up the overall controller manager. Please check the configuration and try again.")
 		return err
 	}
+
+	// Add health check endpoints
+	if err := c.mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {
+		log.Error(err, "Unable to set up health check", "error", err)
+		return err
+	}
+	if err := c.mgr.AddReadyzCheck("readyz", healthz.Ping); err != nil {
+		log.Error(err, "Unable to set up ready check", "error", err)
+		return err
+	}
+
 	log.V(1).Info("Controller manager initialized successfully")
 
 	// Configure the Kubernetes reconciler.

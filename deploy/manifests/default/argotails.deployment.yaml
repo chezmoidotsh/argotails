@@ -2,8 +2,6 @@
 # trunk-ignore-all(checkov/CKV_K8S_38): This is required for Argotails as it is a Kubernetes controller
 # trunk-ignore-all(checkov/CKV_K8S_43,checkov/CKV_K8S_14): The image is managed by Kustomize and the kustomization.yaml
 # trunk-ignore-all(checkov/CKV2_K8S_6): Network policies must be defined by the end-user as they are specific to the environment
-
-# trunk-ignore-all(checkov/CKV_K8S_8,checkov/CKV_K8S_9): Liveness and readiness probes are not yet implemented in Argotails [TODO]
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -34,31 +32,40 @@ spec:
               value: example.ts.net # NOTE: this is a placeholder, replace with your Tailscale tailnet
           image: ghcr.io/chezmoi-sh/argotails:latest
           imagePullPolicy: Always
-          # TODO: readiness/liveness probes are not yet implemented in Argotails
-          # livenessProbe:
-          #   failureThreshold: 3
-          #   httpGet:
-          #     path: /livez
-          #     port: 8080
-          #     scheme: HTTP
-          #   initialDelaySeconds: 5
-          #   periodSeconds: 10
-          #   timeoutSeconds: 1
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: 8081
+              scheme: HTTP
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            timeoutSeconds: 1
           name: argotails
           ports:
             - containerPort: 8080
               name: metrics
               protocol: TCP
-          # TODO: readiness/liveness probes are not yet implemented in Argotails
-          # readinessProbe:
-          #   failureThreshold: 3
-          #   httpGet:
-          #     path: /readyz
-          #     port: 8080
-          #     scheme: HTTP
-          #   initialDelaySeconds: 5
-          #   periodSeconds: 10
-          #   timeoutSeconds: 1
+            - containerPort: 8081
+              name: health
+              protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /readyz
+              port: 8081
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 1
+          startupProbe:
+            failureThreshold: 30
+            httpGet:
+              path: /readyz
+              port: 8081
+              scheme: HTTP
+            periodSeconds: 3
+            timeoutSeconds: 1
           resources:
             limits:
               cpu: 500m
@@ -103,6 +110,10 @@ spec:
       protocol: TCP
       targetPort: 8080
       appProtocol: prometheus
+    - name: health
+      port: 8081
+      protocol: TCP
+      targetPort: 8081
   selector:
     app.kubernetes.io/instance: argotails-controller
   type: ClusterIP
