@@ -1,0 +1,8 @@
+{
+  // Force Github Copilot to work inside the VSCode client and not inside the
+  // devcontainer.
+  "remote.extensionKind": {
+    "GitHub.copilot": ["ui"],
+    "GitHub.copilot-chat": ["ui"]
+  }
+}

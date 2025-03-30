@@ -51,12 +51,14 @@
     "bierner.github-markdown-preview"
     "bierner.markdown-preview-github-styles"
     "golang.go"
+    "jnoortheen.nix-ide"
     "mkhl.direnv"
+    "ms-kubernetes-tools.vscode-kubernetes-tools"
     "tilt-dev.tiltfile"
     "trunk.io"
   ];
   devcontainer.settings.features = {
-    "ghcr.io/devcontainers/features/docker-in-docker:2.12.1" = {};
+    "ghcr.io/devcontainers/features/docker-in-docker:2.12.1" = { };
   };
   difftastic.enable = true;
 
@@ -68,17 +70,30 @@
 
     📚 No documentation has been written yet ... but it is planned
     🚀 How to start my development experience?
-      1. Run \`ctlptl apply -f test/dev/argotails-dev.ctpl.yaml\` to deploy the local Kubernetes cluster
+      1. Run \`dev:setup_kubernetes\` to deploy the local Kubernetes cluster
+         NOTE: This have been probably done for you already when you entered the shell
       2. Run \`tilt up\` to start the Tilt development environment
       3. Start hacking on the code and see the changes live-reloaded in the Kubernetes cluster
     ────────────────────────────────────────────────────────────────────────────────
     EOF
   '';
+  scripts."dev:setup_kubernetes".exec = ''
+    # Start the local Kubernetes cluster
+    echo "🚀 Starting the local Kubernetes cluster..."
+    ctlptl apply -f test/dev/argotails-dev.ctlptl.yaml
+  '';
+
+  tasks."devenv:enterShell:setup_kubernetes" = {
+    exec = ''
+      # Start the local Kubernetes cluster
+      ctlptl apply -f test/dev/argotails-dev.ctlptl.yaml
+    '';
+    before = [ "devenv:enterShell" ];
+    status = "kubectl cluster-info > /dev/null 2>&1";
+  };
 
   enterShell = ''
-    # Show MOTD only once, when the environment is built
-    mkdir --parent "${config.env.DEVENV_ROOT}/.direnv"
-    find "${config.env.DEVENV_ROOT}/.direnv/motd" -type f -mtime +0 -exec rm {} \; 2> /dev/null
-    test -f "${config.env.DEVENV_ROOT}/.direnv/motd" || motd | tee "${config.env.DEVENV_ROOT}/.direnv/motd"
+    # Show MOTD every time we enter the shell
+    motd
   '';
 }
