@@ -51,12 +51,14 @@
     "bierner.github-markdown-preview"
     "bierner.markdown-preview-github-styles"
     "golang.go"
+    "jnoortheen.nix-ide"
     "mkhl.direnv"
+    "ms-kubernetes-tools.vscode-kubernetes-tools"
     "tilt-dev.tiltfile"
     "trunk.io"
   ];
   devcontainer.settings.features = {
-    "ghcr.io/devcontainers/features/docker-in-docker:2.12.1" = {};
+    "ghcr.io/devcontainers/features/docker-in-docker:2.12.1" = { };
   };
   difftastic.enable = true;
 

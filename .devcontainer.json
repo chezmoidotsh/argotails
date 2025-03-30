@@ -5,7 +5,9 @@
         "bierner.github-markdown-preview",
         "bierner.markdown-preview-github-styles",
         "golang.go",
+        "jnoortheen.nix-ide",
         "mkhl.direnv",
+        "ms-kubernetes-tools.vscode-kubernetes-tools",
         "tilt-dev.tiltfile",
         "trunk.io"
       ]
