@@ -277,7 +277,10 @@ $RECYCLE.BIN/
 
 # End of https://www.toptal.com/developers/gitignore/api/go,visualstudiocode,jetbrains+all,vim,emacs,linux,windows,macos
 
-## Additional files to ignore
+### Devenv ###
 /.direnv/
 /.devenv/
 .devenv.flake.nix
+
+### Additional cache folder ###
+.devcontainer/cache/
