@@ -45,6 +45,7 @@ func (suite *ReconcilerSuite) TestReconcile_NewDevice() {
 					Name:          "A.fake.ts.net",
 					Hostname:      "A",
 					NodeID:        "fake-device-id",
+					Addresses:     []string{"0.0.0.0"},
 					OS:            "linux",
 					ClientVersion: "v1.2.3",
 					Tags:          []string{"tag:tag1", "tag:tag2"},
@@ -70,6 +71,7 @@ func (suite *ReconcilerSuite) TestReconcile_NewDevice() {
 	suite.Equal("fake-device-id", secret.Annotations[AnnotationDeviceID])
 	suite.Equal("A", secret.Annotations[AnnotationDeviceHostname])
 	suite.Equal("fake.ts.net", secret.Annotations[AnnotationDeviceTailnet])
+	suite.Equal("0.0.0.0", secret.Annotations[AnnotationDeviceAddress])
 	suite.Equal("cluster", secret.Labels["argocd.argoproj.io/secret-type"])
 	suite.Equal(managedBy, secret.Labels["apps.kubernetes.io/managed-by"])
 	suite.Equal("linux", secret.Labels[LabelDeviceOS])
@@ -91,6 +93,7 @@ func (suite *ReconcilerSuite) TestReconcile_ExistingDevice() {
 				AnnotationDeviceID:       "fake-device-id",
 				AnnotationDeviceHostname: "A",
 				AnnotationDeviceTailnet:  "fake.ts.net",
+				AnnotationDeviceAddress:  "0.0.0.0",
 			},
 			Labels: map[string]string{
 				"argocd.argoproj.io/secret-type": "cluster",
@@ -112,6 +115,7 @@ func (suite *ReconcilerSuite) TestReconcile_ExistingDevice() {
 					Name:          "A.fake.ts.net",
 					Hostname:      "A",
 					NodeID:        "fake-device-id",
+					Addresses:     []string{"0.0.0.0"},
 					OS:            "linux",
 					ClientVersion: "v1.2.3",
 					Tags:          []string{"tag:tag1", "tag:tag2"},
@@ -137,6 +141,7 @@ func (suite *ReconcilerSuite) TestReconcile_ExistingDevice() {
 	suite.Equal("fake-device-id", secret.Annotations[AnnotationDeviceID])
 	suite.Equal("A", secret.Annotations[AnnotationDeviceHostname])
 	suite.Equal("fake.ts.net", secret.Annotations[AnnotationDeviceTailnet])
+	suite.Equal("0.0.0.0", secret.Annotations[AnnotationDeviceAddress])
 	suite.Equal("cluster", secret.Labels["argocd.argoproj.io/secret-type"])
 	suite.Equal(managedBy, secret.Labels["apps.kubernetes.io/managed-by"])
 	suite.Equal("linux", secret.Labels[LabelDeviceOS])
@@ -174,6 +179,7 @@ func (suite *ReconcilerSuite) TestReconcile_UpdatedExistingDevice() {
 					Name:          "A.fake.ts.net",
 					Hostname:      "A",
 					NodeID:        "fake-device-id",
+					Addresses:     []string{"0.0.0.0"},
 					OS:            "linux",
 					ClientVersion: "v1.2.3",
 					Tags:          []string{"tag:tag1", "tag:tag2"},
@@ -205,6 +211,7 @@ func (suite *ReconcilerSuite) TestReconcile_UpdatedExistingDevice() {
 	suite.Equal("fake-device-id", secret.Annotations[AnnotationDeviceID])
 	suite.Equal("A", secret.Annotations[AnnotationDeviceHostname])
 	suite.Equal("fake.ts.net", secret.Annotations[AnnotationDeviceTailnet])
+	suite.Equal("0.0.0.0", secret.Annotations[AnnotationDeviceAddress])
 	suite.Equal("cluster", secret.Labels["argocd.argoproj.io/secret-type"])
 	suite.Equal(managedBy, secret.Labels["apps.kubernetes.io/managed-by"])
 	suite.Equal("linux", secret.Labels[LabelDeviceOS])
@@ -283,6 +290,7 @@ func (suite *ReconcilerSuite) TestCreateSecretDevice() {
 			Name:          "A.fake.ts.net",
 			Hostname:      "A",
 			NodeID:        "fake-device-id",
+			Addresses:     []string{"0.0.0.0"},
 			OS:            "linux",
 			ClientVersion: "v1.2.3",
 			Tags:          []string{"tag:tag1", "tag:tag2"},
@@ -298,6 +306,7 @@ func (suite *ReconcilerSuite) TestCreateSecretDevice() {
 	suite.Equal("fake-device-id", secret.Annotations[AnnotationDeviceID])
 	suite.Equal("A", secret.Annotations[AnnotationDeviceHostname])
 	suite.Equal("fake.ts.net", secret.Annotations[AnnotationDeviceTailnet])
+	suite.Equal("0.0.0.0", secret.Annotations[AnnotationDeviceAddress])
 	suite.Equal("cluster", secret.Labels["argocd.argoproj.io/secret-type"])
 	suite.Equal(managedBy, secret.Labels["apps.kubernetes.io/managed-by"])
 	suite.Equal("linux", secret.Labels[LabelDeviceOS])
@@ -337,6 +346,7 @@ func (suite *ReconcilerSuite) TestUpdateSecretDevice() {
 			Name:          "A.fake.ts.net",
 			Hostname:      "A",
 			NodeID:        "fake-device-id",
+			Addresses:     []string{"0.0.0.0"},
 			OS:            "linux",
 			ClientVersion: "v1.2.3",
 			Tags:          []string{"tag:tag1", "tag:tag2"},
@@ -358,6 +368,7 @@ func (suite *ReconcilerSuite) TestUpdateSecretDevice() {
 	suite.Equal("fake-device-id", secret.Annotations[AnnotationDeviceID])
 	suite.Equal("A", secret.Annotations[AnnotationDeviceHostname])
 	suite.Equal("fake.ts.net", secret.Annotations[AnnotationDeviceTailnet])
+	suite.Equal("0.0.0.0", secret.Annotations[AnnotationDeviceAddress])
 	suite.Equal("cluster", secret.Labels["argocd.argoproj.io/secret-type"])
 	suite.Equal(managedBy, secret.Labels["apps.kubernetes.io/managed-by"])
 	suite.Equal("linux", secret.Labels[LabelDeviceOS])
