@@ -22,6 +22,8 @@ import (
 const (
 	// AnnotationDeviceID is the annotation key for the device ID.
 	AnnotationDeviceID = "device.tailscale.com/id"
+	// AnnotationDeviceAddress is the annotation key for the device address.
+	AnnotationDeviceAddress = "device.tailscale.com/address"
 	// AnnotationDeviceHostname is the annotation key for the device hostname.
 	AnnotationDeviceHostname = "device.tailscale.com/hostname"
 	// AnnotationDeviceTailnet is the annotation key for the device name.
@@ -152,6 +154,7 @@ func (r reconciler) CreateDeviceSecret(ctx context.Context, namespacedName types
 			Namespace: namespacedName.Namespace,
 			Annotations: map[string]string{
 				AnnotationDeviceID:       device.NodeID,
+				AnnotationDeviceAddress:  device.Addresses[0],
 				AnnotationDeviceHostname: device.Hostname,
 			},
 			Labels: map[string]string{
@@ -196,6 +199,7 @@ func (r reconciler) UpdateDeviceSecret(ctx context.Context, namespacedName types
 	// Update secret metadata
 	secret.Annotations[AnnotationDeviceID] = device.NodeID
 	secret.Annotations[AnnotationDeviceHostname] = device.Hostname
+	secret.Annotations[AnnotationDeviceAddress] = device.Addresses[0]
 	secret.Labels["argocd.argoproj.io/secret-type"] = "cluster"
 	secret.Labels["apps.kubernetes.io/managed-by"] = r.managedBy
 	secret.Labels[LabelDeviceOS] = device.OS
