@@ -17,7 +17,7 @@ require (
 	k8s.io/api v0.32.3
 	k8s.io/apimachinery v0.32.3
 	sigs.k8s.io/controller-runtime v0.20.4
-	tailscale.com/client/tailscale/v2 v2.0.0-20250402225416-fe1dae83d8c6
+	tailscale.com/client/tailscale/v2 v2.0.0-20250421223422-17a9401cffa5
 )
 
 require (
