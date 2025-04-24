@@ -1,6 +1,6 @@
 module github.com/chezmoi-sh/argotails
 
-go 1.23.0
+go 1.24.0
 
 toolchain go1.24.2
 
@@ -14,8 +14,8 @@ require (
 	github.com/stretchr/testify v1.10.0
 	go.uber.org/zap v1.27.0
 	golang.org/x/sync v0.13.0
-	k8s.io/api v0.32.4
-	k8s.io/apimachinery v0.32.4
+	k8s.io/api v0.33.0
+	k8s.io/apimachinery v0.33.0
 	sigs.k8s.io/controller-runtime v0.20.4
 	tailscale.com/client/tailscale/v2 v2.0.0-20250421223422-17a9401cffa5
 )
