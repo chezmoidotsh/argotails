@@ -62,7 +62,7 @@ jobs:
           echo "SOURCE_DATE_EPOCH=$(git log -1 --pretty=format:%ct)" >> "${GITHUB_ENV}"
 
       - name: 🔨 Build Docker image
-        uses: docker/build-push-action@14487ce63c7a62a4a324b0bfb37086795e31c6c1 # v6.16.0
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
         with:
           context: .
           load: true
@@ -83,7 +83,7 @@ jobs:
 
       - name: 📦 Publish Docker image
         id: publish
-        uses: docker/build-push-action@14487ce63c7a62a4a324b0bfb37086795e31c6c1 # v6.16.0
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
         with:
           context: .
           platforms: linux/amd64,linux/arm64
