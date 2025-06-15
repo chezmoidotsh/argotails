@@ -27,7 +27,7 @@ RUN set -eux; \
 # ┌───────────────────────────────────────────────────────────────────────────┐
 # │ <runtime>: create the ArgoTails runtime image using all previous stages   │
 # └───────────────────────────────────────────────────────────────────────────┘
-FROM gcr.io/distroless/static:nonroot@sha256:188ddfb9e497f861177352057cb21913d840ecae6c843d39e00d44fa64daa51c
+FROM gcr.io/distroless/static:nonroot@sha256:627d6c5a23ad24e6bdff827f16c7b60e0289029b0c79e9f7ccd54ae3279fb45f
 
 # renovate: datasource=github-tags depName=chezmoi-sh/argotails versioning=semver
 ARG ARGOTAILS_VERSION="v0.1.5"
