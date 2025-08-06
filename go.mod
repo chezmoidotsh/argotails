@@ -6,7 +6,7 @@ toolchain go1.24.4
 
 require (
 	github.com/alecthomas/kong v1.11.0
-	github.com/go-chi/chi/v5 v5.2.1
+	github.com/go-chi/chi/v5 v5.2.2
 	github.com/go-logr/logr v1.4.3
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/oklog/ulid/v2 v2.1.1
