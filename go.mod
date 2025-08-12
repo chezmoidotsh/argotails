@@ -2,7 +2,7 @@ module github.com/chezmoi-sh/argotails
 
 go 1.24.0
 
-toolchain go1.24.6
+toolchain go1.25.0
 
 require (
 	github.com/alecthomas/kong v1.12.1
