@@ -1,7 +1,7 @@
 # ┌───────────────────────────────────────────────────────────────────────────┐
 # │ <builder>: build the ArgoTails binary (Go)                                │
 # └───────────────────────────────────────────────────────────────────────────┘
-FROM docker.io/library/golang:1.24-alpine AS builder
+FROM docker.io/library/golang:1.25-alpine AS builder
 
 # renovate: datasource=github-tags depName=chezmoi-sh/argotails versioning=semver
 ARG ARGOTAILS_VERSION="v0.1.5"
