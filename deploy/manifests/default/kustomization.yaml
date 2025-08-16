@@ -30,5 +30,5 @@ resources:
 
 images:
   - name: ghcr.io/chezmoidotsh/argotails
-    newTag: v0.1.9
-    digest: sha256:9a5410ceefa6b3ced88f486311f37abca446c23f03910fef33882f4e117ce6f3
+    newTag: v0.1.10
+    digest: sha256:f04f073863675e7e0606cd6411a1dc2020d33f3437841c8be6d66582d23d1dec
