@@ -33,8 +33,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 	"tailscale.com/client/tailscale/v2"
 
-	"github.com/chezmoi-sh/argotails/internal/reconciler"
-	tsutils "github.com/chezmoi-sh/argotails/internal/tailscale"
+	"github.com/chezmoidotsh/argotails/internal/reconciler"
+	tsutils "github.com/chezmoidotsh/argotails/internal/tailscale"
 )
 
 type (

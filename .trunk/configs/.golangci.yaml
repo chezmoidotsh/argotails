@@ -167,7 +167,7 @@ linters-settings:
     # A comma-separated list of prefixes, which, if set, checks import paths
     # with the given prefixes are grouped after 3rd-party packages.
     # Default: ""
-    local-prefixes: github.com/chezmoi-sh/argotails
+    local-prefixes: github.com/chezmoidotsh/argotails
 
   govet:
     # Enable all analyzers.

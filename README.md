@@ -7,9 +7,9 @@
 
 <div align="center">
 
-[![Go Version](https://img.shields.io/github/go-mod/go-version/chezmoi-sh/argotails)](https://golang.org)
-[![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/chezmoi-sh/argotails/release.publish-argotails.yaml?logo=github&label=Last%20release)](https://github.com/chezmoi-sh/argotails/actions/workflows/release.publish-argotails.yaml)
-[![Go Report Card](https://goreportcard.com/badge/github.com/chezmoi-sh/argotails)](https://goreportcard.com/report/github.com/chezmoi-sh/argotails)
+[![Go Version](https://img.shields.io/github/go-mod/go-version/chezmoidotsh/argotails)](https://golang.org)
+[![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/chezmoidotsh/argotails/release.publish-argotails.yaml?logo=github&label=Last%20release)](https://github.com/chezmoidotsh/argotails/actions/workflows/release.publish-argotails.yaml)
+[![Go Report Card](https://goreportcard.com/badge/github.com/chezmoidotsh/argotails)](https://goreportcard.com/report/github.com/chezmoidotsh/argotails)
 [![License](https://img.shields.io/badge/license-MIT-blue?logo=git&logoColor=white)](LICENSE)
 
 </div>
@@ -138,7 +138,7 @@ kind: Kustomization
 namespace: argocd
 
 resources:
-  - https://github.com/chezmoi-sh/argotails//deploy/manifests/default?ref=main
+  - https://github.com/chezmoidotsh/argotails//deploy/manifests/default?ref=main
 
 patches:
   - patch: |
@@ -165,7 +165,7 @@ kind: Kustomization
 namespace: argocd
 
 resources:
-  - https://github.com/chezmoi-sh/argotails//deploy/manifests/with-webhook-funnel?ref=main
+  - https://github.com/chezmoidotsh/argotails//deploy/manifests/with-webhook-funnel?ref=main
 
 patches:
   - patch: |

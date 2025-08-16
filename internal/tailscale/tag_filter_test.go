@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"tailscale.com/client/tailscale/v2"
 
-	tsutils "github.com/chezmoi-sh/argotails/internal/tailscale"
+	tsutils "github.com/chezmoidotsh/argotails/internal/tailscale"
 )
 
 func TestNewRegexpTagFilter_Error(t *testing.T) {

@@ -42,5 +42,5 @@ patches:
       kind: Deployment
 
 images:
-  - name: ghcr.io/chezmoi-sh/argotails
+  - name: ghcr.io/chezmoidotsh/argotails
     newTag: dev

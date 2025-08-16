@@ -29,6 +29,6 @@ resources:
 #       kind: Deployment
 
 images:
-  - name: ghcr.io/chezmoi-sh/argotails
+  - name: ghcr.io/chezmoidotsh/argotails
     newTag: v0.1.6
     digest: sha256:b1bdba79d67e997d495f6bdb1f94014f22ead7bba63fc731913fce64e525e12e

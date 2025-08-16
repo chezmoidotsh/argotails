@@ -5,8 +5,8 @@ import (
 
 	"github.com/alecthomas/kong"
 
-	ctrl "github.com/chezmoi-sh/argotails/internal/controller"
-	zapcoreutils "github.com/chezmoi-sh/argotails/internal/zapcore"
+	ctrl "github.com/chezmoidotsh/argotails/internal/controller"
+	zapcoreutils "github.com/chezmoidotsh/argotails/internal/zapcore"
 )
 
 func main() {

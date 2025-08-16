@@ -3,7 +3,7 @@
 # └───────────────────────────────────────────────────────────────────────────┘
 FROM docker.io/library/golang:1.25-alpine AS builder
 
-# renovate: datasource=github-tags depName=chezmoi-sh/argotails versioning=semver
+# renovate: datasource=github-tags depName=chezmoidotsh/argotails versioning=semver
 ARG ARGOTAILS_VERSION="v0.1.5"
 
 RUN set -eux; \
@@ -29,7 +29,7 @@ RUN set -eux; \
 # └───────────────────────────────────────────────────────────────────────────┘
 FROM gcr.io/distroless/static:nonroot@sha256:cdf4daaf154e3e27cfffc799c16f343a384228f38646928a1513d925f473cb46
 
-# renovate: datasource=github-tags depName=chezmoi-sh/argotails versioning=semver
+# renovate: datasource=github-tags depName=chezmoidotsh/argotails versioning=semver
 ARG ARGOTAILS_VERSION="v0.1.5"
 
 COPY --from=builder /src/argotails /src/LICENSE /opt/argotails/
@@ -46,10 +46,10 @@ LABEL \
     org.opencontainers.image.authors="xunleii <xunleii@users.noreply.github.com>" \
     org.opencontainers.image.created="01/01/1970T00:00:00.000" \
     org.opencontainers.image.description="Kubernetes controller for ArgoCD cluster through Tailscale" \
-    org.opencontainers.image.documentation="https://github.com/chezmoi-sh/argotails" \
+    org.opencontainers.image.documentation="https://github.com/chezmoidotsh/argotails" \
     org.opencontainers.image.licenses="MIT" \
     org.opencontainers.image.revision="" \
     org.opencontainers.image.source="" \
     org.opencontainers.image.title="argotails" \
-    org.opencontainers.image.url="https://github.com/chezmoi-sh/argotails" \
+    org.opencontainers.image.url="https://github.com/chezmoidotsh/argotails" \
     org.opencontainers.image.version=${ARGOTAILS_VERSION}

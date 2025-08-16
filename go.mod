@@ -1,4 +1,4 @@
-module github.com/chezmoi-sh/argotails
+module github.com/chezmoidotsh/argotails
 
 go 1.24.0
 

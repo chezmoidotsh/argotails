@@ -20,7 +20,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 	"tailscale.com/client/tailscale/v2"
 
-	tsutils "github.com/chezmoi-sh/argotails/internal/tailscale"
+	tsutils "github.com/chezmoidotsh/argotails/internal/tailscale"
 
 	"testing"
 )

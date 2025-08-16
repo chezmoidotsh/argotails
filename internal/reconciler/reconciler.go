@@ -13,7 +13,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 	"tailscale.com/client/tailscale/v2"
 
-	ts "github.com/chezmoi-sh/argotails/internal/tailscale"
+	ts "github.com/chezmoidotsh/argotails/internal/tailscale"
 
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

@@ -25,7 +25,7 @@ if not cfg.get('ts.tailnet') or not cfg.get('ts.authkey'):
     fail("Please provide a Tailscale Tailnet and Auth Key using `tilt up -- --ts.tailnet=<TAILNET> --ts.authkey=<AUTHKEY>`")
 
 # Build the controller image when the Tiltfile is loaded or when source code changes
-CONTROLLER_IMAGE = 'ghcr.io/chezmoi-sh/argotails:dev'
+CONTROLLER_IMAGE = 'ghcr.io/chezmoidotsh/argotails:dev'
 docker_build(CONTROLLER_IMAGE, '.')
 
 # Generate the default Kustomize manifests and edit the deployment to use the built image and Tailscale secret

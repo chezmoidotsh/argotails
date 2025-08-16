@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"tailscale.com/client/tailscale/v2"
 
-	tsutils "github.com/chezmoi-sh/argotails/internal/tailscale"
+	tsutils "github.com/chezmoidotsh/argotails/internal/tailscale"
 )
 
 func TestNewTailscaleClient_Success(t *testing.T) {
