@@ -17,6 +17,7 @@ import (
 
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
 const (
@@ -52,6 +53,8 @@ type (
 		filter ts.TagFilter
 		// managedBy is the controller name.
 		managedBy string
+		// serviceConfig contains service creation configuration.
+		serviceConfig ServiceConfig
 	}
 
 	Config struct {
@@ -63,11 +66,20 @@ type (
 		// DeviceFilters is the list of tag filters to apply to the devices.
 		DeviceFilters []string
 	}
+
+	ServiceConfig struct {
+		// CreateService enables service creation for multi-cluster ArgoCD support.
+		CreateService bool
+		// ProxyClass is the ProxyClass to use for Tailscale services.
+		ProxyClass string
+		// Namespace is the namespace where services should be created.
+		Namespace string
+	}
 )
 
 // NewReconciler creates a new reconciler based on the provided configuration.
-func NewReconciler(ks client.Client, ts *tailscale.Client, filter ts.TagFilter, managedBy string) (reconcile.TypedReconciler[reconcile.Request], error) {
-	reconciler := &reconciler{ks: ks, ts: ts, filter: filter, managedBy: managedBy}
+func NewReconciler(ks client.Client, ts *tailscale.Client, filter ts.TagFilter, managedBy string, serviceConfig ServiceConfig) (reconcile.TypedReconciler[reconcile.Request], error) {
+	reconciler := &reconciler{ks: ks, ts: ts, filter: filter, managedBy: managedBy, serviceConfig: serviceConfig}
 	return reconciler, nil
 }
 
@@ -102,12 +114,24 @@ func (r reconciler) Reconcile(ctx context.Context, req reconcile.Request) (recon
 	}
 
 	if device == nil || !r.filter.Match(*device) {
-		log.V(0).Info("Tailscale device not found or filtered, Tailscale device's secret will be deleted", "reconciliation.action", "delete")
+		log.V(0).Info("Tailscale device not found or filtered, Tailscale device's secret and service will be deleted", "reconciliation.action", "delete")
+
+		// Delete secret
 		err := r.DeleteDeviceSecret(ctrllog.IntoContext(ctx, log), req.NamespacedName)
 		if err != nil && !errors.IsNotFound(err) {
 			log.Error(err, "Failed to delete Tailscale device's secret", "reconciliation.outcome", "delete_secret_error")
 			return reconcile.Result{Requeue: true}, err
 		}
+
+		// Delete service if service creation is enabled
+		if r.serviceConfig.CreateService {
+			err := r.DeleteDeviceService(ctrllog.IntoContext(ctx, log), req.NamespacedName)
+			if err != nil && !errors.IsNotFound(err) {
+				log.Error(err, "Failed to delete Tailscale device's service", "reconciliation.outcome", "delete_service_error")
+				return reconcile.Result{Requeue: true}, err
+			}
+		}
+
 		log.V(1).Info("Device reconciliation completed with deletion", "reconciliation.outcome", "deleted")
 		return reconcile.Result{}, nil
 	}
@@ -121,6 +145,16 @@ func (r reconciler) Reconcile(ctx context.Context, req reconcile.Request) (recon
 			log.Error(err, "Failed to create Tailscale device's secret", "reconciliation.outcome", "create_secret_error")
 			return reconcile.Result{Requeue: true}, err
 		}
+
+		// Create service if enabled
+		if r.serviceConfig.CreateService {
+			err = r.CreateDeviceService(ctrllog.IntoContext(ctx, log), req.NamespacedName, *device)
+			if err != nil && !errors.IsAlreadyExists(err) {
+				log.Error(err, "Failed to create Tailscale device's service", "reconciliation.outcome", "create_service_error")
+				return reconcile.Result{Requeue: true}, err
+			}
+		}
+
 		log.V(1).Info("Device reconciliation completed with creation", "reconciliation.outcome", "created")
 		return reconcile.Result{}, nil
 	} else if err != nil {
@@ -133,6 +167,15 @@ func (r reconciler) Reconcile(ctx context.Context, req reconcile.Request) (recon
 	if err != nil {
 		log.Error(err, "Failed to update Tailscale device's secret", "reconciliation.outcome", "update_secret_error")
 		return reconcile.Result{Requeue: true}, err
+	}
+
+	// Update service if enabled
+	if r.serviceConfig.CreateService {
+		err = r.UpdateDeviceService(ctrllog.IntoContext(ctx, log), req.NamespacedName, *device)
+		if err != nil {
+			log.Error(err, "Failed to update Tailscale device's service", "reconciliation.outcome", "update_service_error")
+			return reconcile.Result{Requeue: true}, err
+		}
 	}
 
 	log.V(1).Info("Device reconciliation completed with update", "reconciliation.outcome", "updated")
@@ -258,3 +301,108 @@ func (r reconciler) KubernetesClient() client.Client { return r.ks }
 
 // TailscaleClient returns the Tailscale client.
 func (r reconciler) TailscaleClient() *tailscale.Client { return r.ts }
+
+// CreateDeviceService creates a new Tailscale device's service with Tailscale annotations.
+func (r reconciler) CreateDeviceService(ctx context.Context, namespacedName types.NamespacedName, device tailscale.Device) error {
+	log := ctrllog.FromContext(ctx).WithName("create_service")
+
+	service := corev1.Service{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      namespacedName.Name,
+			Namespace: namespacedName.Namespace,
+			Annotations: map[string]string{
+				"tailscale.com/hostname": device.Hostname,
+			},
+			Labels: map[string]string{
+				"apps.kubernetes.io/managed-by": r.managedBy,
+				LabelDeviceOS:                   device.OS,
+				LabelDeviceVersion:              device.ClientVersion,
+			},
+		},
+		Spec: corev1.ServiceSpec{
+			Type: corev1.ServiceTypeClusterIP,
+			Ports: []corev1.ServicePort{
+				{
+					Name:       "https",
+					Port:       443,
+					Protocol:   corev1.ProtocolTCP,
+					TargetPort: intstr.FromInt(443),
+				},
+			},
+		},
+	}
+
+	// Add ProxyClass annotation if specified
+	if r.serviceConfig.ProxyClass != "" {
+		service.Annotations["tailscale.com/proxy-class"] = r.serviceConfig.ProxyClass
+	}
+
+	// Process device tags
+	for _, tag := range device.Tags {
+		service.Labels[LabelDeviceTagsPrefix+strings.TrimPrefix(tag, "tag:")] = ""
+	}
+
+	log.V(3).Info("Create Tailscale device service")
+	return r.ks.Create(ctx, &service)
+}
+
+// UpdateDeviceService updates an existing Tailscale device's service.
+func (r reconciler) UpdateDeviceService(ctx context.Context, namespacedName types.NamespacedName, device tailscale.Device) error {
+	log := ctrllog.FromContext(ctx).WithName("update_service")
+
+	log.V(3).Info("Retrieving current Tailscale device's service")
+	var service corev1.Service
+	err := r.ks.Get(ctx, namespacedName, &service)
+	if errors.IsNotFound(err) {
+		// Service doesn't exist, create it
+		log.V(2).Info("Service not found, creating it")
+		return r.CreateDeviceService(ctx, namespacedName, device)
+	} else if err != nil {
+		return err
+	}
+
+	// Update service metadata
+	service.Annotations["tailscale.com/hostname"] = device.Hostname
+	service.Labels["apps.kubernetes.io/managed-by"] = r.managedBy
+	service.Labels[LabelDeviceOS] = device.OS
+	service.Labels[LabelDeviceVersion] = device.ClientVersion
+
+	// Add ProxyClass annotation if specified
+	if r.serviceConfig.ProxyClass != "" {
+		service.Annotations["tailscale.com/proxy-class"] = r.serviceConfig.ProxyClass
+	}
+
+	// Process device tags
+	for _, tag := range device.Tags {
+		service.Labels[LabelDeviceTagsPrefix+strings.TrimPrefix(tag, "tag:")] = ""
+	}
+
+	log.V(3).Info("Update Tailscale device service")
+	return r.ks.Update(ctx, &service)
+}
+
+// DeleteDeviceService deletes an existing Tailscale device's service.
+func (r reconciler) DeleteDeviceService(ctx context.Context, namespacedName types.NamespacedName) error {
+	log := ctrllog.FromContext(ctx).WithName("delete_service")
+
+	// Get the service first to check if it exists and log its metadata
+	log.V(3).Info("Retrieving current Tailscale device's service")
+	var service corev1.Service
+	err := r.ks.Get(ctx, namespacedName, &service)
+	if err != nil {
+		if errors.IsNotFound(err) {
+			// Service does not exist, nothing to do
+			log.V(3).Info("Tailscale device's service not found, ignoring")
+			return nil
+		}
+		return err
+	}
+
+	log.V(3).Info("Delete Tailscale device service")
+	return r.ks.Delete(ctx, &corev1.Service{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      namespacedName.Name,
+			Namespace: namespacedName.Namespace,
+		},
+	})
+}
