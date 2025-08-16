@@ -414,7 +414,7 @@ func (r reconciler) UpdateDeviceService(ctx context.Context, namespacedName type
 	}
 
 	// Update service metadata
-	service.Annotations["tailscale.com/tailnet-fqdn"] = device.Hostname
+	service.Annotations["tailscale.com/tailnet-fqdn"] = device.Name
 	service.Labels["apps.kubernetes.io/managed-by"] = r.managedBy
 	service.Labels[LabelDeviceOS] = device.OS
 	service.Labels[LabelDeviceVersion] = device.ClientVersion
