@@ -42,6 +42,53 @@ const (
 // regex to extract the tailnet from the device name
 var rxTailnet = regexp.MustCompile(`\.(.+\.ts\.net$)`)
 
+// toDNS1035Name converts a device name to a DNS-1035 compliant service name.
+// DNS-1035 requirements:
+// - Contains only lowercase letters, numbers, and hyphens
+// - Starts and ends with alphanumeric characters
+// - Must be 63 characters or less
+func toDNS1035Name(deviceName string) string {
+	// Convert to lowercase
+	name := strings.ToLower(deviceName)
+
+	// Replace dots with hyphens
+	name = strings.ReplaceAll(name, ".", "-")
+
+	// Remove any characters that aren't lowercase letters, numbers, or hyphens
+	validChars := regexp.MustCompile(`[^a-z0-9-]`)
+	name = validChars.ReplaceAllString(name, "")
+
+	// Replace consecutive hyphens with a single hyphen
+	multipleHyphens := regexp.MustCompile(`-+`)
+	name = multipleHyphens.ReplaceAllString(name, "-")
+
+	// Ensure it starts with alphanumeric
+	for len(name) > 0 && name[0] == '-' {
+		name = name[1:]
+	}
+
+	// Ensure it ends with alphanumeric
+	for len(name) > 0 && name[len(name)-1] == '-' {
+		name = name[:len(name)-1]
+	}
+
+	// Truncate to 63 characters if necessary
+	if len(name) > 63 {
+		name = name[:63]
+		// Make sure it still ends with alphanumeric after truncation
+		for len(name) > 0 && name[len(name)-1] == '-' {
+			name = name[:len(name)-1]
+		}
+	}
+
+	// If name is empty after cleaning, provide a fallback
+	if name == "" {
+		name = "tailscale-device"
+	}
+
+	return name
+}
+
 type (
 	reconciler struct {
 		// ts is the Tailscale client.
@@ -308,7 +355,7 @@ func (r reconciler) CreateDeviceService(ctx context.Context, namespacedName type
 
 	service := corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      namespacedName.Name,
+			Name:      toDNS1035Name(namespacedName.Name),
 			Namespace: namespacedName.Namespace,
 			Annotations: map[string]string{
 				"tailscale.com/hostname": device.Hostname,
@@ -352,7 +399,11 @@ func (r reconciler) UpdateDeviceService(ctx context.Context, namespacedName type
 
 	log.V(3).Info("Retrieving current Tailscale device's service")
 	var service corev1.Service
-	err := r.ks.Get(ctx, namespacedName, &service)
+	serviceNamespacedName := types.NamespacedName{
+		Name:      toDNS1035Name(namespacedName.Name),
+		Namespace: namespacedName.Namespace,
+	}
+	err := r.ks.Get(ctx, serviceNamespacedName, &service)
 	if errors.IsNotFound(err) {
 		// Service doesn't exist, create it
 		log.V(2).Info("Service not found, creating it")
@@ -388,7 +439,11 @@ func (r reconciler) DeleteDeviceService(ctx context.Context, namespacedName type
 	// Get the service first to check if it exists and log its metadata
 	log.V(3).Info("Retrieving current Tailscale device's service")
 	var service corev1.Service
-	err := r.ks.Get(ctx, namespacedName, &service)
+	serviceNamespacedName := types.NamespacedName{
+		Name:      toDNS1035Name(namespacedName.Name),
+		Namespace: namespacedName.Namespace,
+	}
+	err := r.ks.Get(ctx, serviceNamespacedName, &service)
 	if err != nil {
 		if errors.IsNotFound(err) {
 			// Service does not exist, nothing to do
@@ -401,7 +456,7 @@ func (r reconciler) DeleteDeviceService(ctx context.Context, namespacedName type
 	log.V(3).Info("Delete Tailscale device service")
 	return r.ks.Delete(ctx, &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      namespacedName.Name,
+			Name:      toDNS1035Name(namespacedName.Name),
 			Namespace: namespacedName.Namespace,
 		},
 	})

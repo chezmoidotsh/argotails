@@ -429,6 +429,72 @@ func (suite *ReconcilerSuite) TearDownTest() {
 	suite.reconciler = nil
 }
 
+func TestToDNS1035Name(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{
+			name:     "uppercase with dots",
+			input:    "A.fake.ts.net",
+			expected: "a-fake-ts-net",
+		},
+		{
+			name:     "lowercase with dots",
+			input:    "test.cluster.ts.net",
+			expected: "test-cluster-ts-net",
+		},
+		{
+			name:     "mixed case with special chars",
+			input:    "My-Device_123.example.ts.net",
+			expected: "my-device123-example-ts-net",
+		},
+		{
+			name:     "starts with hyphen",
+			input:    "-test.ts.net",
+			expected: "test-ts-net",
+		},
+		{
+			name:     "ends with hyphen",
+			input:    "test-.ts.net",
+			expected: "test-ts-net",
+		},
+		{
+			name:     "only hyphens and invalid chars",
+			input:    "---___---",
+			expected: "tailscale-device",
+		},
+		{
+			name:     "very long name",
+			input:    "very-long-device-name-that-exceeds-the-dns-1035-limit-of-63-characters.ts.net",
+			expected: "very-long-device-name-that-exceeds-the-dns-1035-limit-of-63-cha",
+		},
+		{
+			name:     "simple alphanumeric",
+			input:    "device123",
+			expected: "device123",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := toDNS1035Name(tt.input)
+			if result != tt.expected {
+				t.Errorf("toDNS1035Name(%q) = %q, want %q", tt.input, result, tt.expected)
+			}
+
+			// Verify the result is DNS-1035 compliant
+			if len(result) > 63 {
+				t.Errorf("Result %q exceeds 63 characters", result)
+			}
+			if result != "" && (result[0] == '-' || result[len(result)-1] == '-') {
+				t.Errorf("Result %q starts or ends with hyphen", result)
+			}
+		})
+	}
+}
+
 func TestReconcilerSuite(t *testing.T) {
 	suite.Run(t, new(ReconcilerSuite))
 }
