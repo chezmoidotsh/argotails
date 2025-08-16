@@ -59,6 +59,11 @@ type (
 
 		Namespace string `name:"namespace" help:"Namespace where ArgoCD cluster secret must be created (configure it only if Argotails runs outside the cluster)." env:"NAMESPACE"` // trunk-ignore(golangci-lint/lll)
 
+		Service struct {
+			CreateService bool   `name:"create" help:"Create Kubernetes services with Tailscale annotations for multi-cluster ArgoCD support." default:"false" env:"CREATE_SERVICE" group:"Service flags"`
+			ProxyClass    string `name:"proxy-class" help:"ProxyClass to use for Tailscale services (optional)." env:"SERVICE_PROXY_CLASS" group:"Service flags"`
+		} `embed:"" prefix:"service." envprefix:"SERVICE_"`
+
 		Log struct {
 			Development bool                 `name:"devel" help:"Enable development logging." env:"DEVEL" group:"Log flags"`
 			Verbosity   zapcore.LevelEnabler `name:"v" help:"Log verbosity level." default:"2" env:"VERBOSITY" group:"Log flags"`
@@ -178,7 +183,11 @@ func (c *RunCmd) Run(cli *kong.Context) error {
 	log.V(1).Info("Tag filter initialized successfully")
 
 	log.V(1).Info("Initializing reconciler")
-	c.reconciler, err = reconciler.NewReconciler(c.mgr.GetClient(), c.ts, filter, c.ctrlName)
+	c.reconciler, err = reconciler.NewReconciler(c.mgr.GetClient(), c.ts, filter, c.ctrlName, reconciler.ServiceConfig{
+		CreateService: c.Service.CreateService,
+		ProxyClass:    c.Service.ProxyClass,
+		Namespace:     c.Namespace,
+	})
 	if err != nil {
 		log.Error(err, "Unable to create Tailscale reconciler. Please check the configuration and try again.")
 		return err
@@ -207,7 +216,7 @@ func (c *RunCmd) kubernetesReconcilationLoop(ctx context.Context) error {
 		WithName("kubernetes")
 	log.V(1).Info("Initializing Kubernetes controller")
 
-	err := builder.
+	controllerBuilder := builder.
 		ControllerManagedBy(c.mgr).
 		Named(c.ctrlName).
 		For(&corev1.Secret{}).
@@ -215,9 +224,15 @@ func (c *RunCmd) kubernetesReconcilationLoop(ctx context.Context) error {
 			if r == nil {
 				return log
 			}
-			return log.WithValues("secret", r)
-		}).
-		Complete(c.reconciler)
+			return log.WithValues("resource", r)
+		})
+
+	// Also watch services if service creation is enabled
+	if c.Service.CreateService {
+		controllerBuilder = controllerBuilder.Owns(&corev1.Service{})
+	}
+
+	err := controllerBuilder.Complete(c.reconciler)
 
 	if err != nil {
 		log.Error(err, "Unable to create controller")

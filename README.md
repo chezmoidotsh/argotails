@@ -46,9 +46,11 @@
 ### ✨ Features
 
 - **Real-time Synchronization:** Automatically update ArgoCD secrets when Tailscale devices are added or removed.
+- **Multi-cluster ArgoCD Support:** Create Kubernetes services with Tailscale annotations for the official Tailscale multi-cluster ArgoCD solution.
 - **Customizable Filters:** Use regular expressions to determine which Tailscale devices should be synchronized.
 - **Flexible Deployment:** Deploy Argotails on any Kubernetes cluster with ArgoCD installed.
 - **Webhook Integration:** Optional webhook support for instant updates using Tailscale Funnel or your preferred method.
+- **Backward Compatibility:** Existing sidecar approach continues to work unchanged alongside the new service creation feature.
 
 ---
 
@@ -208,6 +210,10 @@ Tailscale flags
   --ts.webhook.secret=TAILSCALE_WEBHOOK_SECRET              Tailscale webhook secret ($TAILSCALE_WEBHOOK_SECRET).
   --ts.webhook.secret-file=TAILSCALE_WEBHOOK_SECRET_FILE    Path to the file containing the Tailscale webhook secret ($TAILSCALE_WEBHOOK_SECRET_FILE).
 
+Service flags
+  --service.create                   Create Kubernetes services with Tailscale annotations for multi-cluster ArgoCD support ($CREATE_SERVICE).
+  --service.proxy-class=STRING       ProxyClass to use for Tailscale services (optional) ($SERVICE_PROXY_CLASS).
+
 ArgoCD flags
   --argocd.namespace=STRING    Namespace where ArgoCD is installed (if the controller is runned outside a cluster) ($ARGOCD_NAMESPACE).
 
@@ -219,6 +225,37 @@ Log flags
 
 > \[!TIP]
 > You can also load credentials from files using the `--ts.authkey-file` and `--ts.webhook.secret-file` flags.
+
+### Service Creation for Multi-cluster ArgoCD
+
+Argotails supports the official [Tailscale multi-cluster ArgoCD solution](https://tailscale.com/kb/1506/argo-cd) by creating Kubernetes services with Tailscale annotations. When enabled, Argotails creates services alongside secrets, allowing the Tailscale Kubernetes Operator to manage dedicated proxy pods for each cluster.
+
+**When to Use Service Creation:**
+
+- You want to use the official Tailscale multi-cluster ArgoCD approach
+- You prefer dedicated proxy pods over sidecar containers
+- You need more granular control over network policies and resource allocation
+- You want to leverage Tailscale ProxyClass configurations
+
+**Service Creation Behavior:**
+
+- Services are created with `tailscale.com/hostname` annotation set to the device hostname
+- Optional `tailscale.com/proxy-class` annotation when `--service.proxy-class` is specified
+- Services are managed alongside secrets - created, updated, and deleted in sync with device changes
+- All device tags and metadata are preserved in service labels for filtering and identification
+
+**Example Usage:**
+
+```bash
+argotails run \
+  --ts.tailnet=my-tailnet.ts.net \
+  --ts.authkey=tskey-auth-xxxxxxxxxxxx \
+  --service.create \
+  --service.proxy-class=my-proxy-class
+```
+
+> \[!NOTE]
+> Service creation is disabled by default to maintain backward compatibility. Existing deployments will continue to work unchanged unless explicitly enabled.
 
 ---
 
