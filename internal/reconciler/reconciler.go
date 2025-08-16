@@ -367,7 +367,8 @@ func (r reconciler) CreateDeviceService(ctx context.Context, namespacedName type
 			},
 		},
 		Spec: corev1.ServiceSpec{
-			Type: corev1.ServiceTypeClusterIP,
+			Type:         corev1.ServiceTypeExternalName,
+			ExternalName: "ts.net",
 			Ports: []corev1.ServicePort{
 				{
 					Name:       "https",
