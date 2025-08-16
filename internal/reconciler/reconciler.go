@@ -26,7 +26,7 @@ const (
 	// AnnotationDeviceAddress is the annotation key for the device address.
 	AnnotationDeviceAddress = "device.tailscale.com/address"
 	// AnnotationDeviceHostname is the annotation key for the device hostname.
-	AnnotationDeviceHostname = "device.tailscale.com/hostname"
+	AnnotationDeviceHostname = "device.tailscale.com/tailnet-fqdn"
 	// AnnotationDeviceTailnet is the annotation key for the device name.
 	AnnotationDeviceTailnet = "device.tailscale.com/tailnet"
 
@@ -358,7 +358,7 @@ func (r reconciler) CreateDeviceService(ctx context.Context, namespacedName type
 			Name:      toDNS1035Name(namespacedName.Name),
 			Namespace: namespacedName.Namespace,
 			Annotations: map[string]string{
-				"tailscale.com/hostname": device.Hostname,
+				"tailscale.com/tailnet-fqdn": device.Hostname,
 			},
 			Labels: map[string]string{
 				"apps.kubernetes.io/managed-by": r.managedBy,
@@ -414,7 +414,7 @@ func (r reconciler) UpdateDeviceService(ctx context.Context, namespacedName type
 	}
 
 	// Update service metadata
-	service.Annotations["tailscale.com/hostname"] = device.Hostname
+	service.Annotations["tailscale.com/tailnet-fqdn"] = device.Hostname
 	service.Labels["apps.kubernetes.io/managed-by"] = r.managedBy
 	service.Labels[LabelDeviceOS] = device.OS
 	service.Labels[LabelDeviceVersion] = device.ClientVersion

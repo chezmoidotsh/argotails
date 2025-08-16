@@ -239,7 +239,7 @@ Argotails supports the official [Tailscale multi-cluster ArgoCD solution](https:
 
 **Service Creation Behavior:**
 
-- Services are created with `tailscale.com/hostname` annotation set to the device hostname
+- Services are created with `tailscale.com/tailnet-fqdn` annotation set to the device hostname
 - Optional `tailscale.com/proxy-class` annotation when `--service.proxy-class` is specified
 - Services are managed alongside secrets - created, updated, and deleted in sync with device changes
 - All device tags and metadata are preserved in service labels for filtering and identification
