@@ -358,7 +358,7 @@ func (r reconciler) CreateDeviceService(ctx context.Context, namespacedName type
 			Name:      toDNS1035Name(namespacedName.Name),
 			Namespace: namespacedName.Namespace,
 			Annotations: map[string]string{
-				"tailscale.com/tailnet-fqdn": device.Hostname,
+				"tailscale.com/tailnet-fqdn": device.Name,
 			},
 			Labels: map[string]string{
 				"apps.kubernetes.io/managed-by": r.managedBy,
