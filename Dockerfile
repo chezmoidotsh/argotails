@@ -4,7 +4,7 @@
 FROM docker.io/library/golang:1.25-alpine AS builder
 
 # renovate: datasource=github-tags depName=chezmoidotsh/argotails versioning=semver
-ARG ARGOTAILS_VERSION="v0.1.5"
+ARG ARGOTAILS_VERSION="v0.1.12"
 
 RUN set -eux; \
     apk add --no-cache git;
@@ -30,7 +30,7 @@ RUN set -eux; \
 FROM gcr.io/distroless/static:nonroot@sha256:cdf4daaf154e3e27cfffc799c16f343a384228f38646928a1513d925f473cb46
 
 # renovate: datasource=github-tags depName=chezmoidotsh/argotails versioning=semver
-ARG ARGOTAILS_VERSION="v0.1.5"
+ARG ARGOTAILS_VERSION="v0.1.12"
 
 COPY --from=builder /src/argotails /src/LICENSE /opt/argotails/
 
