@@ -12,7 +12,7 @@ require (
 	github.com/stretchr/testify v1.11.1
 	go.uber.org/zap v1.27.0
 	golang.org/x/sync v0.16.0
-	k8s.io/api v0.33.4
+	k8s.io/api v0.34.0
 	k8s.io/apimachinery v0.33.4
 	sigs.k8s.io/controller-runtime v0.21.0
 	tailscale.com/client/tailscale/v2 v2.0.0-20250826152832-32bb577d17b3
