@@ -14,7 +14,7 @@ require (
 	golang.org/x/sync v0.17.0
 	k8s.io/api v0.34.1
 	k8s.io/apimachinery v0.34.1
-	sigs.k8s.io/controller-runtime v0.22.0
+	sigs.k8s.io/controller-runtime v0.22.1
 	tailscale.com/client/tailscale/v2 v2.0.0-20250826152832-32bb577d17b3
 )
 
