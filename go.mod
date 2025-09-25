@@ -15,7 +15,7 @@ require (
 	k8s.io/api v0.34.1
 	k8s.io/apimachinery v0.34.1
 	sigs.k8s.io/controller-runtime v0.22.1
-	tailscale.com/client/tailscale/v2 v2.0.0-20250922184404-b5f56face415
+	tailscale.com/client/tailscale/v2 v2.0.0-20250925170215-115deaf34058
 )
 
 require (
@@ -55,7 +55,7 @@ require (
 	go.yaml.in/yaml/v2 v2.4.2 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	golang.org/x/net v0.43.0 // indirect
-	golang.org/x/oauth2 v0.30.0 // indirect
+	golang.org/x/oauth2 v0.31.0 // indirect
 	golang.org/x/sys v0.35.0 // indirect
 	golang.org/x/term v0.34.0 // indirect
 	golang.org/x/text v0.28.0 // indirect
