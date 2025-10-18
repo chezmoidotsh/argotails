@@ -306,3 +306,5 @@ tailscale.com/client/tailscale/v2 v2.1.0 h1:t21h6ZY07rGo1bWPRGa0pKA4SN/kb9QeUojF
 tailscale.com/client/tailscale/v2 v2.1.0/go.mod h1:RkAl+CyJiu437uUelFWW/2wL+EgZ6Vd15S1f+IitGr4=
 tailscale.com/client/tailscale/v2 v2.2.0 h1:z0MRwojnNcuRcYFumtpymrPH97slBI/zxq0nY/RYcJQ=
 tailscale.com/client/tailscale/v2 v2.2.0/go.mod h1:RkAl+CyJiu437uUelFWW/2wL+EgZ6Vd15S1f+IitGr4=
+tailscale.com/client/tailscale/v2 v2.3.0 h1:MBURNDWzWEB+GMBSnQFhZ2xiTjJg5dqOcFEEqZQ9cyA=
+tailscale.com/client/tailscale/v2 v2.3.0/go.mod h1:RkAl+CyJiu437uUelFWW/2wL+EgZ6Vd15S1f+IitGr4=
