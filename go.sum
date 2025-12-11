@@ -186,6 +186,8 @@ golang.org/x/oauth2 v0.31.0 h1:8Fq0yVZLh4j4YA47vHKFTa9Ew5XIrCP8LC6UeNZnLxo=
 golang.org/x/oauth2 v0.31.0/go.mod h1:lzm5WQJQwKZ3nwavOZ3IS5Aulzxi68dUSgRHujetwEA=
 golang.org/x/oauth2 v0.32.0 h1:jsCblLleRMDrxMN29H3z/k1KliIvpLgCkE6R8FXXNgY=
 golang.org/x/oauth2 v0.32.0/go.mod h1:lzm5WQJQwKZ3nwavOZ3IS5Aulzxi68dUSgRHujetwEA=
+golang.org/x/oauth2 v0.34.0 h1:hqK/t4AKgbqWkdkcAeI8XLmbK+4m4G5YeQRrmiotGlw=
+golang.org/x/oauth2 v0.34.0/go.mod h1:lzm5WQJQwKZ3nwavOZ3IS5Aulzxi68dUSgRHujetwEA=
 golang.org/x/sync v0.0.0-20190423024810-112230192c58/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
 golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
 golang.org/x/sync v0.0.0-20201020160332-67f06af15bc9/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
@@ -342,3 +344,5 @@ tailscale.com/client/tailscale/v2 v2.2.0 h1:z0MRwojnNcuRcYFumtpymrPH97slBI/zxq0n
 tailscale.com/client/tailscale/v2 v2.2.0/go.mod h1:RkAl+CyJiu437uUelFWW/2wL+EgZ6Vd15S1f+IitGr4=
 tailscale.com/client/tailscale/v2 v2.3.0 h1:MBURNDWzWEB+GMBSnQFhZ2xiTjJg5dqOcFEEqZQ9cyA=
 tailscale.com/client/tailscale/v2 v2.3.0/go.mod h1:RkAl+CyJiu437uUelFWW/2wL+EgZ6Vd15S1f+IitGr4=
+tailscale.com/client/tailscale/v2 v2.4.0 h1:jbbuW+VJeu6sveFeMoCm8WL0ecR7LT0WzYwBWuGcQuo=
+tailscale.com/client/tailscale/v2 v2.4.0/go.mod h1:FGjvGT3ThHelqo0gfdK3IN3k1dwNbRzYbQh2XO3C47U=
