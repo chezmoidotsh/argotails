@@ -4,7 +4,7 @@ go 1.25.0
 
 require (
 	github.com/alecthomas/kong v1.13.0
-	github.com/go-chi/chi/v5 v5.2.3
+	github.com/go-chi/chi/v5 v5.2.4
 	github.com/go-logr/logr v1.4.3
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/oklog/ulid/v2 v2.1.1
