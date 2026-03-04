@@ -14,7 +14,7 @@
     }
   },
   "features": {
-    "ghcr.io/devcontainers/features/docker-in-docker:2.16.0": {}
+    "ghcr.io/devcontainers/features/docker-in-docker:2.16.1": {}
   },
   "image": "ghcr.io/cachix/devenv:latest",
   "mounts": [
