@@ -3,7 +3,7 @@ module github.com/chezmoidotsh/argotails
 go 1.26.0
 
 require (
-	github.com/alecthomas/kong v1.14.0
+	github.com/alecthomas/kong v1.15.0
 	github.com/go-chi/chi/v5 v5.2.5
 	github.com/go-logr/logr v1.4.3
 	github.com/hashicorp/go-multierror v1.1.1
