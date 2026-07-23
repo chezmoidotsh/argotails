@@ -7,7 +7,7 @@ require (
 	github.com/go-chi/chi/v5 v5.3.1
 	github.com/go-logr/logr v1.4.3
 	github.com/hashicorp/go-multierror v1.1.1
-	github.com/oklog/ulid/v2 v2.1.1
+	github.com/oklog/ulid/v2 v2.1.2
 	github.com/prometheus/common v0.67.5
 	github.com/stretchr/testify v1.11.1
 	go.uber.org/zap v1.28.0
