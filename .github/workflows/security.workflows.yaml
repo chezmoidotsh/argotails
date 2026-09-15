@@ -27,4 +27,4 @@ jobs:
           ./actionlint -color
 
       - name: ✅ Ensure SHA pinned actions
-        uses: zgosalvez/github-actions-ensure-sha-pinned-actions@fc87bb5b5a97953d987372e74478de634726b3e5 # v3
+        uses: zgosalvez/github-actions-ensure-sha-pinned-actions@e4e462350f03685cf66f0a5f2f0bc3aa5de2df02 # v4
